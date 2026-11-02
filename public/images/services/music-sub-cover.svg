@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="mbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#mbg)"/>
+  <g stroke="#22d3ee" stroke-width="8" stroke-linecap="round">
+    <line x1="330" y1="220" x2="330" y2="170"/>
+    <line x1="365" y1="245" x2="365" y2="145"/>
+    <line x1="400" y1="260" x2="400" y2="130"/>
+    <line x1="435" y1="240" x2="435" y2="155"/>
+    <line x1="470" y1="215" x2="470" y2="175"/>
+  </g>
+  <text x="400" y="335" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="36" font-weight="800">PREMIUM MUSIC PASS</text>
+  <text x="400" y="378" text-anchor="middle" fill="#67e8f9" font-family="system-ui, sans-serif" font-size="20" font-weight="600">AD-FREE • OFFLINE • HIGH QUALITY</text>
+</svg>
+

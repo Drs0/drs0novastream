@@ -1,0 +1,92 @@
+@use '../styles/tokens' as *;
+
+:root {
+  --bg-primary: #{$color-bg-primary};
+  --bg-secondary: #{$color-bg-secondary};
+  --bg-surface: #{$color-bg-surface};
+  --bg-surface-elevated: #{$color-bg-surface-elevated};
+  --border-subtle: #{$color-border-subtle};
+  --border-accent: #{$color-border-accent};
+  --text-primary: #{$color-text-primary};
+  --text-secondary: #{$color-text-secondary};
+  --text-muted: #{$color-text-muted};
+  --accent-cyan: #{$color-accent-cyan};
+  --accent-blue: #{$color-accent-blue};
+  --accent-offer: #{$color-accent-offer};
+  --whatsapp: #{$color-whatsapp};
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: $color-bg-primary;
+  color: $color-text-primary;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background-color: $color-bg-primary;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.12), transparent 35%),
+    radial-gradient(circle at 85% 15%, rgba(6, 182, 212, 0.1), transparent 35%);
+  color: $color-text-primary;
+  font-family: var(--font-sans, 'Inter', system-ui, -apple-system, sans-serif);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+html[dir='rtl'] body {
+  font-family: var(--font-arabic, 'Cairo', 'Noto Sans Arabic', system-ui, sans-serif);
+  line-height: 1.75;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Keep Latin brand names, SKUs, prices, and phone numbers properly oriented inside RTL Darija layouts */
+.ltrInline {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+/* Flip directional arrows automatically in RTL */
+html[dir='rtl'] .directionalIcon {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

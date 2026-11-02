@@ -1,0 +1,70 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.section {
+  padding-block: 3.5rem;
+}
+
+.container {
+  @include container;
+  max-width: 56rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.25rem;
+}
+
+.title {
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  font-weight: 800;
+}
+
+.subtitle {
+  color: $color-text-muted;
+  margin-top: 0.35rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.item {
+  @include card-surface;
+  overflow: hidden;
+}
+
+.trigger {
+  width: 100%;
+  padding-block: 1.15rem;
+  padding-inline: 1.35rem;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: start;
+  font-weight: 700;
+  font-size: 1rem;
+  color: $color-text-primary;
+  cursor: pointer;
+  @include focus-ring;
+
+  &:hover {
+    color: $color-accent-cyan;
+  }
+}
+
+.answer {
+  padding-inline: 1.35rem;
+  padding-bottom: 1.2rem;
+  color: $color-text-secondary;
+  font-size: 0.94rem;
+  line-height: 1.65;
+  border-top: 1px solid $color-border-subtle;
+  padding-top: 0.9rem;
+}
+

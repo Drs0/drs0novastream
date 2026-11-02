@@ -1,0 +1,206 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.section {
+  padding-block: 3.5rem;
+}
+
+.container {
+  @include container;
+}
+
+.headerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  font-weight: 800;
+  color: $color-text-primary;
+}
+
+.subtitle {
+  color: $color-text-muted;
+  font-size: 0.96rem;
+  margin-top: 0.25rem;
+}
+
+.viewAllLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: $color-accent-cyan;
+  font-weight: 600;
+  font-size: 0.92rem;
+
+  &:hover {
+    color: $color-accent-cyan-hover;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.serviceCard {
+  @include card-surface;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-inline-start: 2px solid transparent;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: $color-border-accent;
+    border-inline-start-color: $color-accent-cyan;
+    box-shadow: $shadow-glow;
+  }
+}
+
+.mediaWrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: $color-bg-primary;
+  overflow: hidden;
+}
+
+.coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+
+  .serviceCard:hover & {
+    transform: scale(1.03);
+  }
+}
+
+.badgesOverlay {
+  position: absolute;
+  top: 0.75rem;
+  inset-inline-start: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.featuredBadge {
+  padding-block: 0.22rem;
+  padding-inline: 0.65rem;
+  border-radius: $radius-pill;
+  background: rgba(6, 182, 212, 0.92);
+  color: #031124;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.saleBadge {
+  padding-block: 0.22rem;
+  padding-inline: 0.65rem;
+  border-radius: $radius-pill;
+  background: $color-accent-offer;
+  color: #1c1002;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.65rem;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.categoryLabel {
+  color: $color-accent-cyan;
+  font-weight: 600;
+}
+
+.statusDot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.statusAvailable {
+  color: $color-status-success;
+}
+
+.statusUnavailable {
+  color: $color-text-muted;
+}
+
+.cardTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: $color-text-primary;
+  line-height: 1.35;
+}
+
+.shortDesc {
+  color: $color-text-muted;
+  font-size: 0.88rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.footerRow {
+  margin-top: 0.65rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid $color-border-subtle;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.priceLabel {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: $color-text-primary;
+}
+
+.ctaBtn {
+  @include button-base;
+  min-height: 2.35rem;
+  padding-block: 0.45rem;
+  padding-inline: 0.95rem;
+  font-size: 0.85rem;
+  background: rgba(6, 182, 212, 0.14);
+  border-color: $color-border-accent;
+  color: $color-accent-cyan-hover;
+
+  &:hover {
+    background: linear-gradient(135deg, $color-accent-cyan, $color-accent-blue);
+    color: #031124;
+  }
+}
+

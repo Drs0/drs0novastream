@@ -1,0 +1,37 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  background: rgba(12, 19, 36, 0.85);
+  border: 1px solid $color-border-subtle;
+  border-radius: $radius-pill;
+}
+
+.langBtn {
+  padding-block: 0.35rem;
+  padding-inline: 0.7rem;
+  border-radius: $radius-pill;
+  border: none;
+  background: transparent;
+  color: $color-text-secondary;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  @include focus-ring;
+
+  &:hover {
+    color: $color-text-primary;
+  }
+}
+
+.active {
+  background: linear-gradient(135deg, $color-accent-cyan, $color-accent-blue);
+  color: #04101f;
+  font-weight: 700;
+}
+

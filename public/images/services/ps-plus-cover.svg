@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1128"/>
+      <stop offset="50%" stop-color="#11224d"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="75%" cy="25%" r="50%">
+      <stop offset="0%" stop-color="#facc15" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#0a1128" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#glow)"/>
+  <g transform="translate(400, 210)" fill="none" stroke="#facc15" stroke-width="10" stroke-linecap="round">
+    <line x1="-55" y1="0" x2="55" y2="0"/>
+    <line x1="0" y1="-55" x2="0" y2="55"/>
+  </g>
+  <text x="400" y="340" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="38" font-weight="800" letter-spacing="1">PLAYSTATION PLUS</text>
+  <text x="400" y="382" text-anchor="middle" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="20" font-weight="600">ESSENTIAL • EXTRA • PREMIUM</text>
+</svg>
+
