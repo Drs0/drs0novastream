@@ -82,3 +82,13 @@ export interface AdminUserRow {
   created_at: string;
 }
 
+export interface ServiceReviewRow {
+  id: string;
+  service_id: string;
+  reviewer_name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+}
+
+

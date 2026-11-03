@@ -236,3 +236,25 @@ export function validateImageUpload(file: {
   return { valid: true };
 }
 
+export const serviceReviewInputSchema = z.object({
+  service_id: z.string().uuid('Valid service ID is required'),
+  reviewer_name: z
+    .string()
+    .trim()
+    .min(1, 'Name is required')
+    .max(80, 'Name must be 80 characters or fewer'),
+  rating: z
+    .number()
+    .int('Rating must be a whole number')
+    .min(1, 'Minimum rating is 1 star')
+    .max(5, 'Maximum rating is 5 stars'),
+  comment: z
+    .string()
+    .trim()
+    .min(2, 'Review message is required')
+    .max(600, 'Review message must be 600 characters or fewer'),
+});
+
+export type ServiceReviewInput = z.infer<typeof serviceReviewInputSchema>;
+
+

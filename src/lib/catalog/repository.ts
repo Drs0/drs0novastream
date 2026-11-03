@@ -8,6 +8,7 @@ import type {
   CategoryRow,
   CategoryTranslationRow,
   Locale,
+  ServiceReviewRow,
   ServiceRow,
   ServiceTranslationRow,
   ServiceVariantRow,
@@ -21,6 +22,7 @@ import { computeServicePriceSummary } from './pricing';
 import {
   SEED_CATEGORIES,
   SEED_CATEGORY_TRANSLATIONS,
+  SEED_SERVICE_REVIEWS,
   SEED_SERVICES,
   SEED_SERVICE_TRANSLATIONS,
   SEED_SITE_SETTINGS,
@@ -38,6 +40,7 @@ interface MockCatalogStore {
   services: ServiceRow[];
   serviceTranslations: ServiceTranslationRow[];
   variants: ServiceVariantRow[];
+  reviews: ServiceReviewRow[];
   siteSettings: SiteSettingRow[];
 }
 
@@ -53,8 +56,12 @@ function getMockStore(): MockCatalogStore {
       services: structuredClone(SEED_SERVICES),
       serviceTranslations: structuredClone(SEED_SERVICE_TRANSLATIONS),
       variants: structuredClone(SEED_VARIANTS),
+      reviews: structuredClone(SEED_SERVICE_REVIEWS),
       siteSettings: structuredClone(SEED_SITE_SETTINGS),
     };
+  }
+  if (!globalForMock.__novastreamMockStore.reviews) {
+    globalForMock.__novastreamMockStore.reviews = structuredClone(SEED_SERVICE_REVIEWS);
   }
   return globalForMock.__novastreamMockStore;
 }
@@ -316,6 +323,85 @@ export async function getPublicServiceBySlug(
   const services = await getPublicServices(locale);
   return services.find((s) => s.slug === slug) ?? null;
 }
+
+export async function getPublicServiceReviews(
+  serviceId: string
+): Promise<ServiceReviewRow[]> {
+  const { isConfigured } = getSupabaseEnv();
+
+  if (isConfigured) {
+    try {
+      const supabase = await createSupabaseServerClient();
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('service_reviews')
+          .select('*')
+          .eq('service_id', serviceId)
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          return data as ServiceReviewRow[];
+        }
+      }
+    } catch {
+      // Fall back gracefully if table not yet migrated or connection fails
+    }
+  }
+
+  const store = getMockStore();
+  return store.reviews
+    .filter((r) => r.service_id === serviceId)
+    .sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+
+export async function createPublicServiceReview(input: {
+  service_id: string;
+  reviewer_name: string;
+  rating: number;
+  comment: string;
+}): Promise<ServiceReviewRow> {
+  const cleanName = input.reviewer_name.trim();
+  const cleanRating = Math.min(5, Math.max(1, Math.round(input.rating)));
+  const cleanComment = input.comment.trim();
+  const { isConfigured } = getSupabaseEnv();
+
+  if (isConfigured) {
+    try {
+      const supabase = await createSupabaseServerClient();
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('service_reviews')
+          .insert({
+            service_id: input.service_id,
+            reviewer_name: cleanName,
+            rating: cleanRating,
+            comment: cleanComment,
+          })
+          .select('*')
+          .single();
+
+        if (!error && data) {
+          return data as ServiceReviewRow;
+        }
+      }
+    } catch {
+      // Fall back to mock store if table not yet created
+    }
+  }
+
+  const store = getMockStore();
+  const newReview: ServiceReviewRow = {
+    id: crypto.randomUUID(),
+    service_id: input.service_id,
+    reviewer_name: cleanName,
+    rating: cleanRating,
+    comment: cleanComment,
+    created_at: new Date().toISOString(),
+  };
+  store.reviews.unshift(newReview);
+  return newReview;
+}
+
 
 export async function getPublicSiteSettings(): Promise<PublicSiteSettings> {
   const { isConfigured } = getSupabaseEnv();

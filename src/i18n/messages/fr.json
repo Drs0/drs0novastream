@@ -96,7 +96,20 @@
     "descriptionHeading": "Description du service",
     "relatedHeading": "Services similaires",
     "skuLabel": "Référence",
-    "galleryHeading": "Galerie d’aperçu"
+    "galleryHeading": "Galerie d’aperçu",
+    "reviewsHeading": "Avis des clients",
+    "reviewsCount": "{count} avis",
+    "noReviewsYet": "Aucun avis pour le moment. Soyez le premier à noter ce jeu !",
+    "writeReviewTitle": "Noter ce jeu",
+    "yourNameLabel": "Votre nom",
+    "yourNamePlaceholder": "Entrez votre nom",
+    "yourRatingLabel": "Votre note",
+    "yourMessageLabel": "Votre avis",
+    "yourMessagePlaceholder": "Écrivez votre avis...",
+    "submitReviewBtn": "Envoyer l’avis",
+    "submittingReview": "Envoi...",
+    "reviewSubmittedToast": "Merci ! Votre avis a été ajouté.",
+    "reviewErrorRequired": "Veuillez entrer votre nom, choisir une note et écrire votre avis."
   },
   "categoriesPage": {
     "title": "Parcourir par Catégorie",

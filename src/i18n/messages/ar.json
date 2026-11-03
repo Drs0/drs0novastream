@@ -96,7 +96,20 @@
     "descriptionHeading": "تفاصيل الخدمة",
     "relatedHeading": "خدمات أخرى تقدر تعجبك",
     "skuLabel": "المرجع",
-    "galleryHeading": "صور الخدمة"
+    "galleryHeading": "صور الخدمة",
+    "reviewsHeading": "تقييمات الزبناء",
+    "reviewsCount": "{count} تقييم",
+    "noReviewsYet": "مازال ما كاين حتى تقييم. كون أول واحد يقيم هاد اللعبة!",
+    "writeReviewTitle": "قيّم هاد اللعبة",
+    "yourNameLabel": "السمية ديالك",
+    "yourNamePlaceholder": "كتب السمية ديالك",
+    "yourRatingLabel": "التقييم ديالك",
+    "yourMessageLabel": "الرأي ديالك",
+    "yourMessagePlaceholder": "كتب التقييم ديالك هنا...",
+    "submitReviewBtn": "صيفط التقييم",
+    "submittingReview": "كيتصيفط...",
+    "reviewSubmittedToast": "شكراً! التقييم ديالك تزاد بنجاح.",
+    "reviewErrorRequired": "عافاك دخل السمية ديالك، اختار عدد النجوم، وكتب التقييم ديالك."
   },
   "categoriesPage": {
     "title": "تصفح حسب الأصناف",

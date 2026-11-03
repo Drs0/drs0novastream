@@ -23,11 +23,14 @@ import {
   buildWhatsAppOrderUrl,
 } from '../lib/whatsapp';
 import {
+  serviceReviewInputSchema,
   serviceUpsertSchema,
   serviceVariantInputSchema,
   validateImageUpload,
 } from '../lib/validations/catalog';
 import {
+  createPublicServiceReview,
+  getPublicServiceReviews,
   getPublicServices,
   getPublicSiteSettings,
   resolveLocalizedService,
@@ -419,6 +422,50 @@ async function runAllTests() {
     const gtaAr = arServices.find((s) => s.slug === 'gta-vi');
     assert.ok(gtaAr, 'GTA VI must be returned in public services');
     assert.equal(gtaAr.coverImagePath, '/images/offers/ar/gta-vi.jpg');
+  });
+
+  await test('14. Game reviews support name, 1-5 star rating, and review message', async () => {
+    const mig4Path = path.join(
+      process.cwd(),
+      'supabase/migrations/0004_service_reviews.sql'
+    );
+    assert.ok(fs.existsSync(mig4Path), '0004_service_reviews.sql must exist');
+    const mig4Sql = fs.readFileSync(mig4Path, 'utf8');
+    assert.ok(
+      mig4Sql.includes('CREATE TABLE IF NOT EXISTS public.service_reviews'),
+      'Migration 0004 must create public.service_reviews'
+    );
+
+    const validReview = serviceReviewInputSchema.safeParse({
+      service_id: '22222222-2222-4222-8222-222222222208',
+      reviewer_name: 'Karim',
+      rating: 5,
+      comment: 'Fast delivery and great support!',
+    });
+    assert.equal(validReview.success, true);
+
+    const invalidReview = serviceReviewInputSchema.safeParse({
+      service_id: '22222222-2222-4222-8222-222222222208',
+      reviewer_name: '',
+      rating: 6,
+      comment: '',
+    });
+    assert.equal(invalidReview.success, false);
+
+    const created = await createPublicServiceReview({
+      service_id: '22222222-2222-4222-8222-222222222208',
+      reviewer_name: 'Tariq B.',
+      rating: 5,
+      comment: 'Excellent service on WhatsApp!',
+    });
+    assert.equal(created.reviewer_name, 'Tariq B.');
+    assert.equal(created.rating, 5);
+    assert.equal(created.comment, 'Excellent service on WhatsApp!');
+
+    const reviews = await getPublicServiceReviews(
+      '22222222-2222-4222-8222-222222222208'
+    );
+    assert.ok(reviews.some((r) => r.reviewer_name === 'Tariq B.'));
   });
 
   console.log(`\nAll ${passed} test suites passed successfully!`);

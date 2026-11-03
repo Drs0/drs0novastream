@@ -96,7 +96,20 @@
     "descriptionHeading": "Service Description",
     "relatedHeading": "Related Services",
     "skuLabel": "Reference",
-    "galleryHeading": "Preview Gallery"
+    "galleryHeading": "Preview Gallery",
+    "reviewsHeading": "Customer Reviews",
+    "reviewsCount": "{count} review(s)",
+    "noReviewsYet": "No reviews yet. Be the first to rate this game!",
+    "writeReviewTitle": "Rate this game",
+    "yourNameLabel": "Your name",
+    "yourNamePlaceholder": "Enter your name",
+    "yourRatingLabel": "Your rating",
+    "yourMessageLabel": "Your review",
+    "yourMessagePlaceholder": "Write your review...",
+    "submitReviewBtn": "Submit review",
+    "submittingReview": "Submitting...",
+    "reviewSubmittedToast": "Thank you! Your review has been added.",
+    "reviewErrorRequired": "Please enter your name, select a rating, and write a review message."
   },
   "categoriesPage": {
     "title": "Browse by Category",

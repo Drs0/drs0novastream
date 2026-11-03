@@ -5,6 +5,7 @@ import { Link } from '@/i18n/routing';
 import { getActiveLocale } from '@/i18n/request';
 import {
   getPublicServiceBySlug,
+  getPublicServiceReviews,
   getPublicServices,
   getPublicSiteSettings,
 } from '@/lib/catalog/repository';
@@ -12,6 +13,7 @@ import { buildLocalizedMetadata } from '@/lib/seo';
 import { ServiceGallery } from '@/components/storefront/ServiceGallery';
 import { VariantSelector } from '@/components/storefront/VariantSelector';
 import { ServiceCard } from '@/components/storefront/ServiceCard';
+import { ServiceReviews } from '@/components/storefront/ServiceReviews';
 import styles from '../../StorefrontPages.module.scss';
 
 export async function generateMetadata({
@@ -52,6 +54,8 @@ export default async function ServiceDetailPage({
   if (!service) {
     notFound();
   }
+
+  const reviews = await getPublicServiceReviews(service.id);
 
   const relatedServices = allServices
     .filter(
@@ -129,6 +133,13 @@ export default async function ServiceDetailPage({
           </section>
         )}
       </div>
+
+      <ServiceReviews
+        serviceId={service.id}
+        serviceSlug={service.slug}
+        initialReviews={reviews}
+        locale={locale}
+      />
 
       {relatedServices.length > 0 && (
         <section className={styles.relatedSection}>
