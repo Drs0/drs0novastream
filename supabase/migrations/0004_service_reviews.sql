@@ -58,20 +58,3 @@ CREATE POLICY "Admins can delete service_reviews"
   FOR DELETE
   TO authenticated
   USING (public.is_admin());
-
--- Seed Initial Customer Reviews (Name + Star Rating + Message)
-INSERT INTO public.service_reviews (id, service_id, reviewer_name, rating, comment, created_at)
-VALUES
-  ('44444444-4444-4444-8444-444444444401', '22222222-2222-4222-8222-222222222201', 'Youssef M.', 5, 'Service rapide sur WhatsApp, activation PS Plus Extra en 5 minutes !', '2026-11-01T14:20:00Z'),
-  ('44444444-4444-4444-8444-444444444402', '22222222-2222-4222-8222-222222222201', 'Amine K.', 5, 'أحسن ثمن فالمغرب وتعامل نقي بزاف، شكراً NovaStream.', '2026-11-02T18:10:00Z'),
-  ('44444444-4444-4444-8444-444444444403', '22222222-2222-4222-8222-222222222207', 'Hamza B.', 5, 'Compte Principal PS5 reçu immédiatement, fonctionne nickel.', '2026-11-02T19:00:00Z'),
-  ('44444444-4444-4444-8444-444444444404', '22222222-2222-4222-8222-222222222207', 'Mehdi R.', 5, 'خديت فيفا 27 برايمري، التفعيل داز فالحين والخدمة فالمنستوى.', '2026-11-03T11:30:00Z'),
-  ('44444444-4444-4444-8444-444444444405', '22222222-2222-4222-8222-222222222208', 'Oussama T.', 5, 'Fast support and clear instructions on WhatsApp. Highly recommended!', '2026-11-03T12:15:00Z'),
-  ('44444444-4444-4444-8444-444444444406', '22222222-2222-4222-8222-222222222208', 'Zakaria E.', 5, 'Top service au Maroc, réponse rapide et prix imbattable.', '2026-11-03T13:05:00Z'),
-  ('44444444-4444-4444-8444-444444444407', '22222222-2222-4222-8222-222222222209', 'Anas L.', 5, 'Jeu incroyable, livraison rapide et explications très claires.', '2026-11-03T13:40:00Z'),
-  ('44444444-4444-4444-8444-444444444408', '22222222-2222-4222-8222-222222222210', 'Karim S.', 5, 'ثقة وسرعة فالتجاوب عبر واتساب، الله ييسر ليكم.', '2026-11-03T14:00:00Z'),
-  ('44444444-4444-4444-8444-444444444409', '22222222-2222-4222-8222-222222222239', 'Soufiane A.', 5, 'Elden Ring sur PS5 en compte Principal au top, merci !', '2026-11-03T14:30:00Z')
-ON CONFLICT (id) DO UPDATE SET
-  comment = EXCLUDED.comment,
-  rating = EXCLUDED.rating,
-  reviewer_name = EXCLUDED.reviewer_name;
