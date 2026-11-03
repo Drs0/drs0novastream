@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="cbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#cbg)"/>
+  <polygon points="375,155 445,200 375,245" fill="#fb7185"/>
+  <circle cx="400" cy="200" r="65" fill="none" stroke="#fb7185" stroke-width="5"/>
+  <text x="400" y="335" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="36" font-weight="800">4K CINEMA STREAMING</text>
+  <text x="400" y="378" text-anchor="middle" fill="#fda4af" font-family="system-ui, sans-serif" font-size="20" font-weight="600">ULTRA HD • SMART TV &amp; MOBILE</text>
+</svg>
+

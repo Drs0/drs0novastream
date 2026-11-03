@@ -1,0 +1,190 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.pageContainer {
+  @include container;
+  padding-block: 2.75rem 3.5rem;
+}
+
+.pageHeader {
+  margin-bottom: 2.25rem;
+}
+
+.pageTitle {
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  font-weight: 900;
+  color: $color-text-primary;
+}
+
+.pageSubtitle {
+  color: $color-text-muted;
+  font-size: 1rem;
+  margin-top: 0.4rem;
+  max-width: 44rem;
+}
+
+.howItWorksSection {
+  padding-block: 3.5rem;
+  background: rgba(12, 19, 36, 0.55);
+  border-block: 1px solid $color-border-subtle;
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stepCard {
+  @include card-surface;
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  border-top: 3px solid $color-accent-cyan;
+}
+
+.stepTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: $color-text-primary;
+}
+
+.stepText {
+  color: $color-text-secondary;
+  font-size: 0.92rem;
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.86rem;
+  color: $color-text-muted;
+  margin-bottom: 1.75rem;
+}
+
+.breadcrumbLink {
+  color: $color-text-secondary;
+
+  &:hover {
+    color: $color-accent-cyan;
+  }
+}
+
+.detailLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.25rem;
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: 1.15fr 1fr;
+    align-items: start;
+  }
+}
+
+.detailHeader {
+  margin-bottom: 1.25rem;
+}
+
+.categoryPill {
+  display: inline-block;
+  padding-block: 0.25rem;
+  padding-inline: 0.75rem;
+  border-radius: $radius-pill;
+  background: rgba(6, 182, 212, 0.14);
+  color: $color-accent-cyan-hover;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.detailTitle {
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.detailShortDesc {
+  margin-top: 0.5rem;
+  color: $color-text-secondary;
+  font-size: 1rem;
+}
+
+.infoSections {
+  margin-top: 2.75rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}
+
+.infoCard {
+  @include card-surface;
+  padding: 1.5rem;
+}
+
+.infoCardTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  color: $color-text-primary;
+}
+
+.infoCardBody {
+  color: $color-text-secondary;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.relatedSection {
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid $color-border-subtle;
+}
+
+.relatedGrid {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.proseCard {
+  @include card-surface;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  max-width: 52rem;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-top: 2rem;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+

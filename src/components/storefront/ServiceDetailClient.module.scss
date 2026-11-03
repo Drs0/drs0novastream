@@ -1,0 +1,200 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.galleryWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.mainImageBox {
+  @include card-surface;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: $color-bg-primary;
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.thumbBtn {
+  width: 5.2rem;
+  height: 3.4rem;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  border: 2px solid $color-border-subtle;
+  background: $color-bg-primary;
+  cursor: pointer;
+  padding: 0;
+  @include focus-ring;
+
+  &.thumbActive {
+    border-color: $color-accent-cyan;
+    box-shadow: $shadow-glow;
+  }
+}
+
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.selectorPanel {
+  @include card-surface;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.dimensionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.dimensionLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $color-text-secondary;
+}
+
+.optionsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.optionPill {
+  min-height: 2.5rem;
+  padding-block: 0.45rem;
+  padding-inline: 1rem;
+  border-radius: $radius-md;
+  border: 1px solid $color-border-subtle;
+  background: rgba(12, 19, 36, 0.85);
+  color: $color-text-secondary;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  @include focus-ring;
+
+  &:hover:not(:disabled) {
+    border-color: $color-accent-cyan;
+    color: $color-text-primary;
+  }
+
+  &.optionSelected {
+    background: rgba(6, 182, 212, 0.16);
+    border-color: $color-accent-cyan;
+    color: $color-accent-cyan-hover;
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.2);
+  }
+
+  &.optionUnavailable {
+    border-style: dashed;
+    opacity: 0.65;
+  }
+
+  &:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+}
+
+.priceBox {
+  padding: 1.15rem;
+  border-radius: $radius-md;
+  background: rgba(7, 11, 20, 0.75);
+  border: 1px solid $color-border-subtle;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.priceHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: $color-text-muted;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.currentPrice {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: $color-text-primary;
+}
+
+.oldPrice {
+  font-size: 1.05rem;
+  color: $color-text-muted;
+  text-decoration: line-through;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-block: 0.2rem;
+  padding-inline: 0.65rem;
+  border-radius: $radius-pill;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.badgeAvailable {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.badgeUnavailable {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.noticeText {
+  font-size: 0.88rem;
+  color: $color-status-warning;
+}
+
+.whatsappBtn {
+  @include button-base;
+  width: 100%;
+  min-height: 3.1rem;
+  background: $color-whatsapp;
+  color: #04150a;
+  font-weight: 800;
+  font-size: 1rem;
+
+  &:hover:not(:disabled) {
+    background: $color-whatsapp-hover;
+    transform: translateY(-1px);
+  }
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: $color-text-muted;
+  line-height: 1.5;
+}
+

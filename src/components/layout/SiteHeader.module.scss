@@ -1,0 +1,126 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  @include glass-panel;
+  border-inline: none;
+  border-top: none;
+}
+
+.inner {
+  @include container;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 4.5rem;
+  gap: 1rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: $color-text-primary;
+  @include focus-ring;
+}
+
+.logoMark {
+  width: 2.3rem;
+  height: 2.3rem;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.35));
+}
+
+.brandAccent {
+  color: $color-accent-cyan;
+}
+
+.desktopNav {
+  display: none;
+  align-items: center;
+  gap: 1.5rem;
+
+  @media (min-width: $breakpoint-lg) {
+    display: flex;
+  }
+}
+
+.navLink {
+  color: $color-text-secondary;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding-block: 0.35rem;
+  transition: color 0.15s ease;
+  @include focus-ring;
+
+  &:hover,
+  &.activeLink {
+    color: $color-accent-cyan;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileMenuBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: $radius-md;
+  border: 1px solid $color-border-subtle;
+  background: rgba(17, 27, 51, 0.75);
+  color: $color-text-primary;
+  cursor: pointer;
+  @include focus-ring;
+
+  @media (min-width: $breakpoint-lg) {
+    display: none;
+  }
+}
+
+.mobileDrawer {
+  border-top: 1px solid $color-border-subtle;
+  background: $color-bg-secondary;
+  padding-block: 1rem;
+  padding-inline: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  @media (min-width: $breakpoint-lg) {
+    display: none;
+  }
+}
+
+.mobileNavLink {
+  padding-block: 0.65rem;
+  padding-inline: 0.75rem;
+  border-radius: $radius-sm;
+  color: $color-text-secondary;
+  font-weight: 600;
+
+  &:hover {
+    background: rgba(6, 182, 212, 0.1);
+    color: $color-accent-cyan;
+  }
+}
+
+.mobileLangRow {
+  padding-top: 0.5rem;
+  border-top: 1px solid $color-border-subtle;
+  display: flex;
+  justify-content: flex-start;
+}
+

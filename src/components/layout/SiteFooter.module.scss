@@ -1,0 +1,99 @@
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as *;
+
+.footer {
+  margin-top: 5rem;
+  background: $color-bg-secondary;
+  border-top: 1px solid $color-border-subtle;
+  padding-block: 3.5rem 2rem;
+}
+
+.container {
+  @include container;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid $color-border-subtle;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+  }
+}
+
+.brandTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  display: inline-block;
+}
+
+.brandAccent {
+  color: $color-accent-cyan;
+}
+
+.tagline {
+  color: $color-text-muted;
+  font-size: 0.92rem;
+  max-width: 24rem;
+}
+
+.colTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: 0.85rem;
+}
+
+.linkList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.footerLink {
+  color: $color-text-muted;
+  font-size: 0.9rem;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: $color-accent-cyan;
+  }
+}
+
+.socialRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+
+.socialPill {
+  padding-block: 0.3rem;
+  padding-inline: 0.7rem;
+  border-radius: $radius-pill;
+  border: 1px solid $color-border-subtle;
+  font-size: 0.8rem;
+  color: $color-text-secondary;
+
+  &:hover {
+    border-color: $color-accent-cyan;
+    color: $color-accent-cyan;
+  }
+}
+
+.bottomBar {
+  padding-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: $color-text-muted;
+  font-size: 0.85rem;
+}
+

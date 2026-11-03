@@ -1,0 +1,68 @@
+@use './tokens' as *;
+
+@mixin container {
+  width: 100%;
+  max-width: $container-max-width;
+  margin-inline: auto;
+  padding-inline: 1rem;
+
+  @media (min-width: $breakpoint-md) {
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    padding-inline: 2rem;
+  }
+}
+
+@mixin glass-panel {
+  background: $color-bg-glass;
+  backdrop-filter: blur(14px);
+  border: 1px solid $color-border-subtle;
+}
+
+@mixin card-surface {
+  background: linear-gradient(160deg, $color-bg-surface 0%, $color-bg-secondary 100%);
+  border: 1px solid $color-border-subtle;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid $color-accent-cyan;
+    outline-offset: 2px;
+  }
+}
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding-block: 0.625rem;
+  padding-inline: 1.25rem;
+  border-radius: $radius-md;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+  @include focus-ring;
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
