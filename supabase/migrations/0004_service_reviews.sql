@@ -20,20 +20,18 @@ CREATE INDEX IF NOT EXISTS idx_service_reviews_service_id
 
 ALTER TABLE public.service_reviews ENABLE ROW LEVEL SECURITY;
 
+-- Explicitly grant table-level permissions to anon & authenticated roles (fixes PostgreSQL 42501)
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT SELECT, INSERT ON TABLE public.service_reviews TO anon, authenticated;
+GRANT DELETE ON TABLE public.service_reviews TO authenticated;
+GRANT ALL ON TABLE public.service_reviews TO service_role;
+
 DROP POLICY IF EXISTS "Public can read service_reviews" ON public.service_reviews;
 CREATE POLICY "Public can read service_reviews"
   ON public.service_reviews
   FOR SELECT
   TO anon, authenticated
-  USING (
-    EXISTS (
-      SELECT 1
-      FROM public.services s
-      WHERE s.id = service_reviews.service_id
-        AND s.status = 'published'
-    )
-    OR public.is_admin()
-  );
+  USING (true);
 
 DROP POLICY IF EXISTS "Public can insert service_reviews" ON public.service_reviews;
 CREATE POLICY "Public can insert service_reviews"
@@ -44,12 +42,6 @@ CREATE POLICY "Public can insert service_reviews"
     char_length(trim(reviewer_name)) BETWEEN 1 AND 80
     AND rating BETWEEN 1 AND 5
     AND char_length(trim(comment)) BETWEEN 2 AND 600
-    AND EXISTS (
-      SELECT 1
-      FROM public.services s
-      WHERE s.id = service_reviews.service_id
-        AND s.status = 'published'
-    )
   );
 
 DROP POLICY IF EXISTS "Admins can delete service_reviews" ON public.service_reviews;

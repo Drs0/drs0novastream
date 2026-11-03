@@ -4165,31 +4165,6 @@ export const SEED_SITE_SETTINGS: SiteSettingRow[] = [
   },
 ];
 
-export const SEED_SERVICE_REVIEWS: ServiceReviewRow[] = [
-  {
-    id: '44444444-4444-4444-8444-444444444401',
-    service_id: '22222222-2222-4222-8222-222222222201',
-    reviewer_name: 'Yassine M.',
-    rating: 5,
-    comment: 'Activation rapide sur WhatsApp, mon abonnement PS Plus Extra marche nickel sur ma PS5.',
-    created_at: '2026-11-02T14:20:00Z',
-  },
-  {
-    id: '44444444-4444-4444-8444-444444444402',
-    service_id: '22222222-2222-4222-8222-222222222207',
-    reviewer_name: 'Amine K.',
-    rating: 5,
-    comment: 'خدمة نقية وسريعة فـ واتساب، ثمن مناسب بزاف مقارنة بالسوق.',
-    created_at: '2026-11-02T18:10:00Z',
-  },
-  {
-    id: '44444444-4444-4444-8444-444444444403',
-    service_id: '22222222-2222-4222-8222-222222222208',
-    reviewer_name: 'Omar H.',
-    rating: 5,
-    comment: 'Super support client sur WhatsApp, réponse en moins de 5 minutes !',
-    created_at: '2026-11-03T11:30:00Z',
-  },
-];
+export const SEED_SERVICE_REVIEWS: ServiceReviewRow[] = [];
 
 
