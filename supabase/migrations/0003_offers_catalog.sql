@@ -2,6 +2,51 @@
 -- NovaStream Migration 0003: Add 34 Promotional Offers & Localized 1:1 Images
 -- ============================================================================
 
+-- 0. Ensure Supabase Storage Bucket & Offer Seeding Policies Exist
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'service-images',
+  'service-images',
+  TRUE,
+  5242880,
+  ARRAY['image/webp', 'image/avif', 'image/png', 'image/jpeg']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = EXCLUDED.public,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS "Public can view service-images" ON storage.objects;
+CREATE POLICY "Public can view service-images"
+  ON storage.objects
+  FOR SELECT
+  TO anon, authenticated
+  USING (bucket_id = 'service-images');
+
+DROP POLICY IF EXISTS "Allow offer image seeding" ON storage.objects;
+CREATE POLICY "Allow offer image seeding"
+  ON storage.objects
+  FOR INSERT
+  TO anon, authenticated
+  WITH CHECK (
+    bucket_id = 'service-images'
+    AND (storage.foldername(name))[1] = 'offers'
+  );
+
+DROP POLICY IF EXISTS "Allow offer image upsert" ON storage.objects;
+CREATE POLICY "Allow offer image upsert"
+  ON storage.objects
+  FOR UPDATE
+  TO anon, authenticated
+  USING (
+    bucket_id = 'service-images'
+    AND (storage.foldername(name))[1] = 'offers'
+  )
+  WITH CHECK (
+    bucket_id = 'service-images'
+    AND (storage.foldername(name))[1] = 'offers'
+  );
+
 -- 1. Ensure Core Categories Exist
 INSERT INTO public.categories (id, name, slug, description, image_path, sort_order, is_active)
 VALUES
@@ -12,8 +57,8 @@ ON CONFLICT (id) DO NOTHING;
 -- 2. Update PlayStation Plus 1-Year Offers & Localized 1:1 Images
 UPDATE public.services
 SET
-  cover_image_path = '/images/offers/fr/playstation-plus.jpg',
-  gallery_paths = ARRAY['/images/offers/fr/playstation-plus.jpg', '/images/offers/en/playstation-plus.jpg', '/images/offers/ar/playstation-plus.jpg']
+  cover_image_path = 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/playstation-plus.jpg',
+  gallery_paths = ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/playstation-plus.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/playstation-plus.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/playstation-plus.jpg']
 WHERE id = '22222222-2222-4222-8222-222222222201';
 
 -- Upsert PlayStation Plus 12-Month Variants from Promotional Offer Table
@@ -47,8 +92,8 @@ INSERT INTO public.services (
     'ea-sports-fc-27',
     'PS4 & PS5 Standard and Ultimate Edition football offers with Primary and Secondary access.',
     'Experience the next chapter of world football with EA Sports FC 27 on PS4 and PS5. Choose between Standard and Ultimate Editions with Primary or Secondary account options.',
-    '/images/offers/fr/ea-sports-fc-27.jpg',
-    ARRAY['/images/offers/fr/ea-sports-fc-27.jpg', '/images/offers/en/ea-sports-fc-27.jpg', '/images/offers/ar/ea-sports-fc-27.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/ea-sports-fc-27.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/ea-sports-fc-27.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/ea-sports-fc-27.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/ea-sports-fc-27.jpg'],
     'published',
     TRUE,
     6,
@@ -63,8 +108,8 @@ INSERT INTO public.services (
     'gta-vi',
     'Return to Vice City on PS5 with Standard and Ultimate Edition account offers.',
     'Pre-order and secure your Grand Theft Auto VI PS5 digital access in Morocco. Choose between Standard Edition and Ultimate Edition in Primary or Secondary mode.',
-    '/images/offers/fr/gta-vi.jpg',
-    ARRAY['/images/offers/fr/gta-vi.jpg', '/images/offers/en/gta-vi.jpg', '/images/offers/ar/gta-vi.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/gta-vi.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/gta-vi.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/gta-vi.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/gta-vi.jpg'],
     'published',
     TRUE,
     7,
@@ -79,8 +124,8 @@ INSERT INTO public.services (
     'baldurs-gate-3',
     'Award-winning Dungeons & Dragons RPG for PS5 with Primary and Secondary options.',
     'Gather your party and return to the Forgotten Realms in Baldur''s Gate 3 on PS5. Available with instant WhatsApp support.',
-    '/images/offers/fr/baldurs-gate-3.jpg',
-    ARRAY['/images/offers/fr/baldurs-gate-3.jpg', '/images/offers/en/baldurs-gate-3.jpg', '/images/offers/ar/baldurs-gate-3.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/baldurs-gate-3.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/baldurs-gate-3.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/baldurs-gate-3.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/baldurs-gate-3.jpg'],
     'published',
     TRUE,
     8,
@@ -95,8 +140,8 @@ INSERT INTO public.services (
     'forza-horizon-6',
     'Open-world racing festival on PS5 with Primary and Secondary account offers.',
     'Explore breathtaking roads and cherry blossom landscapes in Forza Horizon 6 on PS5. Available in Primary and Secondary digital accounts.',
-    '/images/offers/fr/forza-horizon-6.jpg',
-    ARRAY['/images/offers/fr/forza-horizon-6.jpg', '/images/offers/en/forza-horizon-6.jpg', '/images/offers/ar/forza-horizon-6.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/forza-horizon-6.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/forza-horizon-6.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/forza-horizon-6.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/forza-horizon-6.jpg'],
     'published',
     TRUE,
     9,
@@ -111,8 +156,8 @@ INSERT INTO public.services (
     'phantom-blade-zero',
     'High-speed kungfupunk action RPG on PS5 with Primary and Secondary offers.',
     'Master lethal martial arts and dark steampunk weaponry in Phantom Blade Zero on PS5. Choose Primary or Secondary account access.',
-    '/images/offers/fr/phantom-blade-zero.jpg',
-    ARRAY['/images/offers/fr/phantom-blade-zero.jpg', '/images/offers/en/phantom-blade-zero.jpg', '/images/offers/ar/phantom-blade-zero.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/phantom-blade-zero.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/phantom-blade-zero.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/phantom-blade-zero.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/phantom-blade-zero.jpg'],
     'published',
     TRUE,
     10,
@@ -127,8 +172,8 @@ INSERT INTO public.services (
     'the-last-of-us-part-1',
     'Standard and Remastered editions of the emotional storytelling masterpiece.',
     'Experience Joel and Ellie''s unforgettable journey across a post-pandemic world. Available in Standard and Remastered editions with Primary or Secondary access.',
-    '/images/offers/fr/the-last-of-us-part-1.jpg',
-    ARRAY['/images/offers/fr/the-last-of-us-part-1.jpg', '/images/offers/en/the-last-of-us-part-1.jpg', '/images/offers/ar/the-last-of-us-part-1.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/the-last-of-us-part-1.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/the-last-of-us-part-1.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/the-last-of-us-part-1.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/the-last-of-us-part-1.jpg'],
     'published',
     FALSE,
     11,
@@ -143,8 +188,8 @@ INSERT INTO public.services (
     'the-last-of-us-part-2',
     'Standard and Remastered editions for PS4 & PS5 in Primary and Secondary access.',
     'Confront the devastating physical and emotional repercussions of Ellie''s actions in The Last of Us Part II. Choose Standard or Remastered Edition.',
-    '/images/offers/fr/the-last-of-us-part-2.jpg',
-    ARRAY['/images/offers/fr/the-last-of-us-part-2.jpg', '/images/offers/en/the-last-of-us-part-2.jpg', '/images/offers/ar/the-last-of-us-part-2.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/the-last-of-us-part-2.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/the-last-of-us-part-2.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/the-last-of-us-part-2.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/the-last-of-us-part-2.jpg'],
     'published',
     FALSE,
     12,
@@ -159,8 +204,8 @@ INSERT INTO public.services (
     'ghost-of-yotei',
     'Epic samurai adventure in northern Japan on PS5 — Standard & Deluxe Editions.',
     'Embark on a cinematic open-world journey around Mount Yotei on PS5. Available in Standard and Deluxe Editions with Primary or Secondary access.',
-    '/images/offers/fr/ghost-of-yotei.jpg',
-    ARRAY['/images/offers/fr/ghost-of-yotei.jpg', '/images/offers/en/ghost-of-yotei.jpg', '/images/offers/ar/ghost-of-yotei.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/ghost-of-yotei.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/ghost-of-yotei.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/ghost-of-yotei.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/ghost-of-yotei.jpg'],
     'published',
     TRUE,
     13,
@@ -175,8 +220,8 @@ INSERT INTO public.services (
     'mortal-shell-2',
     'Dark fantasy soulslike action RPG on PS5 with Primary and Secondary accounts.',
     'Test your resilience and tactical combat mastery in Mortal Shell II on PS5. Available with instant WhatsApp delivery.',
-    '/images/offers/fr/mortal-shell-2.jpg',
-    ARRAY['/images/offers/fr/mortal-shell-2.jpg', '/images/offers/en/mortal-shell-2.jpg', '/images/offers/ar/mortal-shell-2.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/mortal-shell-2.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/mortal-shell-2.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/mortal-shell-2.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/mortal-shell-2.jpg'],
     'published',
     FALSE,
     14,
@@ -191,8 +236,8 @@ INSERT INTO public.services (
     'wo-long-fallen-dynasty',
     'Dark Three Kingdoms action RPG for PS4 & PS5 with Primary and Secondary access.',
     'Fight demons and warlords across a chaotic Three Kingdoms setting in Wo Long: Fallen Dynasty. Available in Primary and Secondary access.',
-    '/images/offers/fr/wo-long-fallen-dynasty.jpg',
-    ARRAY['/images/offers/fr/wo-long-fallen-dynasty.jpg', '/images/offers/en/wo-long-fallen-dynasty.jpg', '/images/offers/ar/wo-long-fallen-dynasty.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/wo-long-fallen-dynasty.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/wo-long-fallen-dynasty.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/wo-long-fallen-dynasty.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/wo-long-fallen-dynasty.jpg'],
     'published',
     FALSE,
     15,
@@ -207,8 +252,8 @@ INSERT INTO public.services (
     'the-witcher-3-remastered',
     'Next-gen remastered open-world RPG for PS5 with Primary and Secondary options.',
     'Play as Geralt of Rivia in the remastered next-gen edition of The Witcher 3: Wild Hunt on PS5. Choose Primary or Secondary access.',
-    '/images/offers/fr/the-witcher-3-remastered.jpg',
-    ARRAY['/images/offers/fr/the-witcher-3-remastered.jpg', '/images/offers/en/the-witcher-3-remastered.jpg', '/images/offers/ar/the-witcher-3-remastered.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/the-witcher-3-remastered.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/the-witcher-3-remastered.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/the-witcher-3-remastered.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/the-witcher-3-remastered.jpg'],
     'published',
     FALSE,
     16,
@@ -223,8 +268,8 @@ INSERT INTO public.services (
     'palworld',
     'Open-world creature collection, crafting, and survival game on PS5.',
     'Explore vast islands, capture Pals, build bases, and team up with friends in Palworld Standard Edition on PS5.',
-    '/images/offers/fr/palworld.jpg',
-    ARRAY['/images/offers/fr/palworld.jpg', '/images/offers/en/palworld.jpg', '/images/offers/ar/palworld.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/palworld.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/palworld.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/palworld.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/palworld.jpg'],
     'published',
     FALSE,
     17,
@@ -239,8 +284,8 @@ INSERT INTO public.services (
     'sea-of-thieves',
     'Shared-world pirate adventure on PS5 — Standard Edition Primary & Secondary.',
     'Set sail, plunder lost treasures, and battle rival crews on the high seas in Sea of Thieves Standard Edition for PS5.',
-    '/images/offers/fr/sea-of-thieves.jpg',
-    ARRAY['/images/offers/fr/sea-of-thieves.jpg', '/images/offers/en/sea-of-thieves.jpg', '/images/offers/ar/sea-of-thieves.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/sea-of-thieves.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/sea-of-thieves.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/sea-of-thieves.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/sea-of-thieves.jpg'],
     'published',
     FALSE,
     18,
@@ -255,8 +300,8 @@ INSERT INTO public.services (
     'marvels-wolverine',
     ' blockbuster PS5 action adventure starring Logan in Primary and Secondary access.',
     'Unleash adamantium claws in Marvel''s Wolverine on PS5. Choose between Primary account access (play on your personal profile) or Secondary account access.',
-    '/images/offers/fr/marvels-wolverine.jpg',
-    ARRAY['/images/offers/fr/marvels-wolverine.jpg', '/images/offers/en/marvels-wolverine.jpg', '/images/offers/ar/marvels-wolverine.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/marvels-wolverine.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/marvels-wolverine.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/marvels-wolverine.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/marvels-wolverine.jpg'],
     'published',
     TRUE,
     19,
@@ -271,8 +316,8 @@ INSERT INTO public.services (
     'the-blood-of-dawnwalker',
     'Dark fantasy vampire action RPG for PS5 with Primary and Secondary options.',
     'Step into a dark medieval world of steel and blood magic in The Blood of Dawnwalker on PS5. Available in Primary and Secondary accounts.',
-    '/images/offers/fr/the-blood-of-dawnwalker.jpg',
-    ARRAY['/images/offers/fr/the-blood-of-dawnwalker.jpg', '/images/offers/en/the-blood-of-dawnwalker.jpg', '/images/offers/ar/the-blood-of-dawnwalker.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/the-blood-of-dawnwalker.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/the-blood-of-dawnwalker.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/the-blood-of-dawnwalker.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/the-blood-of-dawnwalker.jpg'],
     'published',
     FALSE,
     20,
@@ -287,8 +332,8 @@ INSERT INTO public.services (
     'flight-simulator-24',
     'Next-generation aviation simulation with Primary and Secondary account options.',
     'Pursue your aviation career across the globe with a dynamically generated world in Flight Simulator 2024. Choose Primary or Secondary access.',
-    '/images/offers/fr/flight-simulator-24.jpg',
-    ARRAY['/images/offers/fr/flight-simulator-24.jpg', '/images/offers/en/flight-simulator-24.jpg', '/images/offers/ar/flight-simulator-24.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/flight-simulator-24.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/flight-simulator-24.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/flight-simulator-24.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/flight-simulator-24.jpg'],
     'published',
     FALSE,
     21,
@@ -303,8 +348,8 @@ INSERT INTO public.services (
     'sekiro-shadows-die-twice',
     'Game of the Year shinobi action-adventure for PS4 & PS5.',
     'Carve your own clever path to vengeance in FromSoftware''s acclaimed Sekiro: Shadows Die Twice. Available in Primary and Secondary access.',
-    '/images/offers/fr/sekiro-shadows-die-twice.jpg',
-    ARRAY['/images/offers/fr/sekiro-shadows-die-twice.jpg', '/images/offers/en/sekiro-shadows-die-twice.jpg', '/images/offers/ar/sekiro-shadows-die-twice.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/sekiro-shadows-die-twice.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/sekiro-shadows-die-twice.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/sekiro-shadows-die-twice.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/sekiro-shadows-die-twice.jpg'],
     'published',
     FALSE,
     22,
@@ -319,8 +364,8 @@ INSERT INTO public.services (
     'mount-and-blade-2-bannerlord',
     'Medieval combat simulator and strategy RPG for PS4 & PS5.',
     'Raise armies, lead troops into massive medieval battles, and conquer Calradia in Mount & Blade II: Bannerlord.',
-    '/images/offers/fr/mount-and-blade-2-bannerlord.jpg',
-    ARRAY['/images/offers/fr/mount-and-blade-2-bannerlord.jpg', '/images/offers/en/mount-and-blade-2-bannerlord.jpg', '/images/offers/ar/mount-and-blade-2-bannerlord.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/mount-and-blade-2-bannerlord.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/mount-and-blade-2-bannerlord.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/mount-and-blade-2-bannerlord.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/mount-and-blade-2-bannerlord.jpg'],
     'published',
     FALSE,
     23,
@@ -335,8 +380,8 @@ INSERT INTO public.services (
     'alan-wake-2',
     'Psychological survival horror masterpiece on PS5 — Standard Edition.',
     'Solve a deadly mystery in the Pacific Northwest across two interwoven stories in Alan Wake 2 Standard Edition for PS5.',
-    '/images/offers/fr/alan-wake-2.jpg',
-    ARRAY['/images/offers/fr/alan-wake-2.jpg', '/images/offers/en/alan-wake-2.jpg', '/images/offers/ar/alan-wake-2.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/alan-wake-2.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/alan-wake-2.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/alan-wake-2.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/alan-wake-2.jpg'],
     'published',
     FALSE,
     24,
@@ -351,8 +396,8 @@ INSERT INTO public.services (
     'pragmata',
     'Capcom sci-fi action adventure on PS5 with Primary and Secondary accounts.',
     'Explore a dystopian lunar world in Capcom''s breathtaking sci-fi adventure Pragmata on PS5.',
-    '/images/offers/fr/pragmata.jpg',
-    ARRAY['/images/offers/fr/pragmata.jpg', '/images/offers/en/pragmata.jpg', '/images/offers/ar/pragmata.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/pragmata.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/pragmata.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/pragmata.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/pragmata.jpg'],
     'published',
     FALSE,
     25,
@@ -367,8 +412,8 @@ INSERT INTO public.services (
     'assassins-creed-shadows',
     'Feudal Japan shinobi and samurai epic on PS5 with Primary and Secondary access.',
     'Live the intertwined stories of Naoe, an adept shinobi Assassin, and Yasuke, a powerful legendary samurai, in Assassin''s Creed Shadows on PS5.',
-    '/images/offers/fr/assassins-creed-shadows.jpg',
-    ARRAY['/images/offers/fr/assassins-creed-shadows.jpg', '/images/offers/en/assassins-creed-shadows.jpg', '/images/offers/ar/assassins-creed-shadows.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/assassins-creed-shadows.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/assassins-creed-shadows.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/assassins-creed-shadows.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/assassins-creed-shadows.jpg'],
     'published',
     TRUE,
     26,
@@ -383,8 +428,8 @@ INSERT INTO public.services (
     'silent-hill-townfall',
     'Psychological horror chapter in the Silent Hill universe on PS5.',
     'Enter the fog once more in Silent Hill: Townfall on PS5. Available in Primary and Secondary account options with fast setup.',
-    '/images/offers/fr/silent-hill-townfall.jpg',
-    ARRAY['/images/offers/fr/silent-hill-townfall.jpg', '/images/offers/en/silent-hill-townfall.jpg', '/images/offers/ar/silent-hill-townfall.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/silent-hill-townfall.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/silent-hill-townfall.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/silent-hill-townfall.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/silent-hill-townfall.jpg'],
     'published',
     FALSE,
     27,
@@ -399,8 +444,8 @@ INSERT INTO public.services (
     'assassins-creed-black-flag-remake',
     'Next-gen remake of the Golden Age of Piracy classic on PS5.',
     'Command the Jackdaw with Edward Kenway in the rebuilt next-gen Remake of Assassin''s Creed Black Flag on PS5.',
-    '/images/offers/fr/assassins-creed-black-flag-remake.jpg',
-    ARRAY['/images/offers/fr/assassins-creed-black-flag-remake.jpg', '/images/offers/en/assassins-creed-black-flag-remake.jpg', '/images/offers/ar/assassins-creed-black-flag-remake.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/assassins-creed-black-flag-remake.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/assassins-creed-black-flag-remake.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/assassins-creed-black-flag-remake.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/assassins-creed-black-flag-remake.jpg'],
     'published',
     FALSE,
     28,
@@ -415,8 +460,8 @@ INSERT INTO public.services (
     '007-first-light',
     'James Bond espionage action adventure on PS5 with Primary & Secondary access.',
     'Earn your 00 status in IO Interactive''s original James Bond espionage thriller 007 First Light on PS5.',
-    '/images/offers/fr/007-first-light.jpg',
-    ARRAY['/images/offers/fr/007-first-light.jpg', '/images/offers/en/007-first-light.jpg', '/images/offers/ar/007-first-light.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/007-first-light.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/007-first-light.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/007-first-light.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/007-first-light.jpg'],
     'published',
     FALSE,
     29,
@@ -431,8 +476,8 @@ INSERT INTO public.services (
     'arc-raiders',
     'Sci-fi extraction shooter adventure on PS5 with Primary and Secondary accounts.',
     'Enlist as a Raider and scavenge a lethal mechanized Earth in ARC Raiders on PS5. Available in Primary and Secondary access.',
-    '/images/offers/fr/arc-raiders.jpg',
-    ARRAY['/images/offers/fr/arc-raiders.jpg', '/images/offers/en/arc-raiders.jpg', '/images/offers/ar/arc-raiders.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/arc-raiders.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/arc-raiders.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/arc-raiders.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/arc-raiders.jpg'],
     'published',
     FALSE,
     30,
@@ -447,8 +492,8 @@ INSERT INTO public.services (
     'resident-evil-4-remake',
     'Survival horror masterpiece for PS4 & PS5 — Standard Edition Primary & Secondary.',
     'Relive Leon S. Kennedy''s harrowing rescue mission in Resident Evil 4 Remake. Available for both PS4 and PS5 with Primary or Secondary access.',
-    '/images/offers/fr/resident-evil-4-remake.jpg',
-    ARRAY['/images/offers/fr/resident-evil-4-remake.jpg', '/images/offers/en/resident-evil-4-remake.jpg', '/images/offers/ar/resident-evil-4-remake.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/resident-evil-4-remake.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/resident-evil-4-remake.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/resident-evil-4-remake.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/resident-evil-4-remake.jpg'],
     'published',
     TRUE,
     31,
@@ -463,8 +508,8 @@ INSERT INTO public.services (
     'crimson-desert',
     'Open-world action-adventure across Pywel on PS5 — Standard & Deluxe Editions.',
     'Fight for survival across the vast continent of Pywel in Crimson Desert on PS5. Choose Standard or Deluxe Edition in Primary or Secondary mode.',
-    '/images/offers/fr/crimson-desert.jpg',
-    ARRAY['/images/offers/fr/crimson-desert.jpg', '/images/offers/en/crimson-desert.jpg', '/images/offers/ar/crimson-desert.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/crimson-desert.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/crimson-desert.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/crimson-desert.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/crimson-desert.jpg'],
     'published',
     FALSE,
     32,
@@ -479,8 +524,8 @@ INSERT INTO public.services (
     'black-myth-wukong',
     'Action RPG rooted in Chinese mythology on PS5 — Standard & Deluxe Editions.',
     'Set out as the Destined One in Black Myth: Wukong on PS5. Available in Standard and Deluxe Editions with Primary or Secondary access.',
-    '/images/offers/fr/black-myth-wukong.jpg',
-    ARRAY['/images/offers/fr/black-myth-wukong.jpg', '/images/offers/en/black-myth-wukong.jpg', '/images/offers/ar/black-myth-wukong.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/black-myth-wukong.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/black-myth-wukong.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/black-myth-wukong.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/black-myth-wukong.jpg'],
     'published',
     TRUE,
     33,
@@ -495,8 +540,8 @@ INSERT INTO public.services (
     'rust-console-edition',
     'Survive, build, and raid in Rust Console Edition for PS4 & PS5.',
     'Everything wants you to die — overcome thirst, hunger, and other players in Rust Console Edition. Available in Primary and Secondary access.',
-    '/images/offers/fr/rust-console-edition.jpg',
-    ARRAY['/images/offers/fr/rust-console-edition.jpg', '/images/offers/en/rust-console-edition.jpg', '/images/offers/ar/rust-console-edition.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/rust-console-edition.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/rust-console-edition.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/rust-console-edition.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/rust-console-edition.jpg'],
     'published',
     FALSE,
     34,
@@ -511,8 +556,8 @@ INSERT INTO public.services (
     'cod-modern-warfare-4',
     'Tactical first-person shooter campaign and multiplayer on PS5.',
     'Lock and load for next-generation tactical combat and multiplayer action in Call of Duty: Modern Warfare 4 on PS5.',
-    '/images/offers/fr/cod-modern-warfare-4.jpg',
-    ARRAY['/images/offers/fr/cod-modern-warfare-4.jpg', '/images/offers/en/cod-modern-warfare-4.jpg', '/images/offers/ar/cod-modern-warfare-4.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/cod-modern-warfare-4.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/cod-modern-warfare-4.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/cod-modern-warfare-4.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/cod-modern-warfare-4.jpg'],
     'published',
     TRUE,
     35,
@@ -527,8 +572,8 @@ INSERT INTO public.services (
     'resident-evil-9-requiem',
     'Next chapter of survival horror on PS5 — Standard & Deluxe Editions.',
     'Face terrifying new bio-organic threats in Resident Evil 9: Requiem on PS5. Available in Standard and Deluxe Editions.',
-    '/images/offers/fr/resident-evil-9-requiem.jpg',
-    ARRAY['/images/offers/fr/resident-evil-9-requiem.jpg', '/images/offers/en/resident-evil-9-requiem.jpg', '/images/offers/ar/resident-evil-9-requiem.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/resident-evil-9-requiem.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/resident-evil-9-requiem.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/resident-evil-9-requiem.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/resident-evil-9-requiem.jpg'],
     'published',
     TRUE,
     36,
@@ -543,8 +588,8 @@ INSERT INTO public.services (
     'it-takes-two-a-way-out-bundle',
     'Two acclaimed co-op games in a single PS4 & PS5 account (Primary & Secondary).',
     'Get both Hazelight co-op hits — It Takes Two and A Way Out — bundled together in one digital account for PS4 & PS5.',
-    '/images/offers/fr/it-takes-two-a-way-out-bundle.jpg',
-    ARRAY['/images/offers/fr/it-takes-two-a-way-out-bundle.jpg', '/images/offers/en/it-takes-two-a-way-out-bundle.jpg', '/images/offers/ar/it-takes-two-a-way-out-bundle.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/it-takes-two-a-way-out-bundle.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/it-takes-two-a-way-out-bundle.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/it-takes-two-a-way-out-bundle.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/it-takes-two-a-way-out-bundle.jpg'],
     'published',
     TRUE,
     37,
@@ -559,8 +604,8 @@ INSERT INTO public.services (
     'elden-ring',
     'Rise, Tarnished, and claim the Elden Ring on PS4 & PS5 in Primary or Secondary.',
     'Journey through the Lands Between in FromSoftware''s monumental fantasy action-RPG Elden Ring. Available with Primary and Secondary account options.',
-    '/images/offers/fr/elden-ring.jpg',
-    ARRAY['/images/offers/fr/elden-ring.jpg', '/images/offers/en/elden-ring.jpg', '/images/offers/ar/elden-ring.jpg'],
+    'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/elden-ring.jpg',
+    ARRAY['https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/fr/elden-ring.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/en/elden-ring.jpg', 'https://aswgzbvvagjgctesttlv.supabase.co/storage/v1/object/public/service-images/offers/ar/elden-ring.jpg'],
     'published',
     TRUE,
     38,
