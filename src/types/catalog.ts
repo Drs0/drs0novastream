@@ -66,6 +66,16 @@ export interface VariantSelectionState {
   access_type?: AccessType;
 }
 
+export interface CartItem {
+  variantId: string;
+  serviceId: string;
+  serviceSlug: string;
+  serviceName: string;
+  coverImagePath: string | null;
+  variant: ServiceVariantRow;
+  quantity: number;
+}
+
 export interface PublicSiteSettings {
   whatsappNumber: string;
   contactEmail: string;

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Check, ShoppingCart } from 'lucide-react';
 import type { AccessType, Locale, ServiceVariantRow } from '@/types/database';
 import type { VariantSelectionState } from '@/types/catalog';
 import {
@@ -10,24 +11,34 @@ import {
   resolveExactVariant,
 } from '@/lib/catalog/pricing';
 import { formatAccessType, formatDurationMonths } from '@/lib/formatters';
+import { useCart } from './CartContext';
 import { PriceDisplay } from './PriceDisplay';
 import { WhatsAppOrderButton } from './WhatsAppOrderButton';
 import styles from './ServiceDetailClient.module.scss';
 
 interface VariantSelectorProps {
+  serviceId?: string;
+  serviceSlug?: string;
   serviceName: string;
+  coverImagePath?: string | null;
   variants: ServiceVariantRow[];
   locale: Locale;
   whatsappNumber: string;
 }
 
 export function VariantSelector({
+  serviceId = '',
+  serviceSlug = '',
   serviceName,
+  coverImagePath = null,
   variants,
   locale,
   whatsappNumber,
 }: VariantSelectorProps) {
   const t = useTranslations('serviceDetail');
+  const cartT = useTranslations('cart');
+  const { addItem, getItemQuantity, openCart, totalItems } = useCart();
+  const [justAdded, setJustAdded] = useState(false);
   const dimensions = useMemo(
     () => extractServiceVariantDimensions(variants),
     [variants]
@@ -87,6 +98,24 @@ export function VariantSelector({
   );
 
   const isSingleFlatVariant = variants.length === 1;
+  const isOrderable = Boolean(selectedVariant && selectedVariant.is_available);
+  const currentVariantQty = selectedVariant
+    ? getItemQuantity(selectedVariant.id)
+    : 0;
+
+  function handleAddToCart() {
+    if (!selectedVariant || !selectedVariant.is_available) return;
+    addItem({
+      variantId: selectedVariant.id,
+      serviceId: serviceId || selectedVariant.service_id,
+      serviceSlug,
+      serviceName,
+      coverImagePath,
+      variant: selectedVariant,
+    });
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1800);
+  }
 
   return (
     <div className={styles.selectorPanel}>
@@ -267,12 +296,46 @@ export function VariantSelector({
 
       <PriceDisplay variant={selectedVariant} locale={locale} />
 
-      <WhatsAppOrderButton
-        phoneNumber={whatsappNumber}
-        locale={locale}
-        serviceName={serviceName}
-        variant={selectedVariant}
-      />
+      <div className={styles.orderActionsGroup}>
+        <div className={styles.cartActionsRow}>
+          <button
+            type="button"
+            disabled={!isOrderable}
+            onClick={handleAddToCart}
+            className={`${styles.addToCartBtn} ${
+              justAdded ? styles.addToCartSuccess : ''
+            }`}
+          >
+            {justAdded ? <Check size={19} /> : <ShoppingCart size={19} />}
+            <span>
+              {justAdded
+                ? cartT('addedToCart')
+                : currentVariantQty > 0
+                ? `${cartT('addToCart')} (${currentVariantQty})`
+                : cartT('addToCart')}
+            </span>
+          </button>
+
+          {totalItems > 0 && (
+            <button
+              type="button"
+              onClick={openCart}
+              className={styles.viewCartSecondaryBtn}
+            >
+              <span>
+                {cartT('viewCartCount', { count: totalItems })}
+              </span>
+            </button>
+          )}
+        </div>
+
+        <WhatsAppOrderButton
+          phoneNumber={whatsappNumber}
+          locale={locale}
+          serviceName={serviceName}
+          variant={selectedVariant}
+        />
+      </div>
     </div>
   );
 }

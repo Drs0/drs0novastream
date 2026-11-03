@@ -167,6 +167,23 @@
     "errorTitle": "Une erreur est survenue",
     "errorText": "Impossible de charger ce contenu pour le moment. Veuillez réessayer.",
     "backToServices": "Retour aux services"
+  },
+  "cart": {
+    "title": "Votre Panier",
+    "openCart": "Ouvrir le panier",
+    "closeCart": "Fermer le panier",
+    "addToCart": "Ajouter au panier",
+    "addedToCart": "Ajouté au panier !",
+    "viewCartCount": "Voir le panier ({count})",
+    "emptyTitle": "Votre panier est vide",
+    "emptyDescription": "Ajoutez plusieurs jeux ou services à votre panier pour envoyer une seule commande groupée sur WhatsApp.",
+    "removeItem": "Retirer l’article",
+    "decreaseQty": "Diminuer la quantité",
+    "increaseQty": "Augmenter la quantité",
+    "totalLabel": "Total estimé",
+    "orderCartOnWhatsapp": "Commander le panier sur WhatsApp",
+    "clearCart": "Vider le panier",
+    "cartDisclaimer": "Envoie un seul message WhatsApp regroupant tous les jeux choisis."
   }
 }
 

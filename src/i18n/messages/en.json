@@ -167,6 +167,23 @@
     "errorTitle": "Something went wrong",
     "errorText": "We couldn't load the requested content right now. Please try again.",
     "backToServices": "Back to services"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "openCart": "Open cart",
+    "closeCart": "Close cart",
+    "addToCart": "Add to Cart",
+    "addedToCart": "Added to Cart!",
+    "viewCartCount": "View Cart ({count})",
+    "emptyTitle": "Your cart is empty",
+    "emptyDescription": "Add multiple games or services to your cart to send one combined WhatsApp order.",
+    "removeItem": "Remove item",
+    "decreaseQty": "Decrease quantity",
+    "increaseQty": "Increase quantity",
+    "totalLabel": "Total estimate",
+    "orderCartOnWhatsapp": "Order Cart on WhatsApp",
+    "clearCart": "Clear cart",
+    "cartDisclaimer": "Sends one combined WhatsApp message with all selected games."
   }
 }
 

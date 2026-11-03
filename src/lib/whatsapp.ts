@@ -9,6 +9,18 @@ export interface WhatsAppOrderParams {
   variant: ServiceVariantRow;
 }
 
+export interface WhatsAppCartItemInput {
+  serviceName: string;
+  variant: ServiceVariantRow;
+  quantity?: number;
+}
+
+export interface WhatsAppCartOrderParams {
+  phoneNumber: string;
+  locale: Locale;
+  items: WhatsAppCartItemInput[];
+}
+
 /**
  * Sanitizes a WhatsApp phone number to international digits without '+' or spaces.
  */
@@ -71,6 +83,108 @@ export function buildWhatsAppOrderMessage({
 export function buildWhatsAppOrderUrl(params: WhatsAppOrderParams): string {
   const cleanPhone = sanitizeWhatsAppPhone(params.phoneNumber);
   const message = buildWhatsAppOrderMessage(params);
+  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+}
+
+/**
+ * Generates a single combined WhatsApp inquiry message for multiple games/services in the cart.
+ */
+export function buildWhatsAppCartOrderMessage({
+  locale,
+  items,
+}: Omit<WhatsAppCartOrderParams, 'phoneNumber'>): string {
+  if (items.length === 0) {
+    return locale === 'ar'
+      ? 'سلام NovaStream، بغيت نعرف أكثر على الخدمات الرقمية المتوفرة عندكم.'
+      : locale === 'fr'
+      ? 'Bonjour NovaStream ! Je souhaite avoir plus d’informations sur vos services numériques.'
+      : 'Hello NovaStream! I would like to learn more about your available digital services.';
+  }
+
+  let totalMad = 0;
+
+  const lines = items.map((item, idx) => {
+    const qty = Math.max(1, item.quantity ?? 1);
+    const unitPrice = getEffectiveVariantPriceMad(item.variant);
+    const lineTotal = unitPrice * qty;
+    totalMad += lineTotal;
+
+    const unitFormatted = formatMadPrice(unitPrice, locale);
+    const lineTotalFormatted = formatMadPrice(lineTotal, locale);
+    const accessText = formatAccessType(item.variant.access_type, locale);
+    const durationText = item.variant.duration_months
+      ? formatDurationMonths(item.variant.duration_months, locale)
+      : null;
+
+    const titleParts = [item.serviceName];
+    if (item.variant.tier) titleParts.push(item.variant.tier);
+    if (item.variant.edition) titleParts.push(item.variant.edition);
+    const fullServiceTitle = titleParts.join(' ');
+
+    if (locale === 'ar') {
+      const specs: string[] = [];
+      if (item.variant.platform) specs.push(`ديال ${item.variant.platform}`);
+      if (accessText) specs.push(accessText);
+      if (durationText) specs.push(`لمدة ${durationText}`);
+      const specsPart = specs.length > 0 ? ` (${specs.join('، ')})` : '';
+      const qtyPart = qty > 1 ? ` ×${qty}` : '';
+      const refPart = item.variant.sku ? ` [Ref: ${item.variant.sku}]` : '';
+      return `${idx + 1}. ${fullServiceTitle}${specsPart}${qtyPart} — ${lineTotalFormatted}${refPart}`;
+    }
+
+    if (locale === 'fr') {
+      const specs: string[] = [];
+      if (item.variant.platform) specs.push(item.variant.platform);
+      if (accessText) specs.push(accessText);
+      if (durationText) specs.push(durationText);
+      const specsPart = specs.length > 0 ? ` (${specs.join(', ')})` : '';
+      const qtyPart = qty > 1 ? ` ×${qty} (${unitFormatted}/u)` : '';
+      const refPart = item.variant.sku ? ` [Réf: ${item.variant.sku}]` : '';
+      return `${idx + 1}. ${fullServiceTitle}${specsPart}${qtyPart} — ${lineTotalFormatted}${refPart}`;
+    }
+
+    // English ('en')
+    const specs: string[] = [];
+    if (item.variant.platform) specs.push(item.variant.platform);
+    if (accessText) specs.push(accessText);
+    if (durationText) specs.push(durationText);
+    const specsPart = specs.length > 0 ? ` (${specs.join(', ')})` : '';
+    const qtyPart = qty > 1 ? ` ×${qty} (${unitFormatted} each)` : '';
+    const refPart = item.variant.sku ? ` [Ref: ${item.variant.sku}]` : '';
+    return `${idx + 1}. ${fullServiceTitle}${specsPart}${qtyPart} — ${lineTotalFormatted}${refPart}`;
+  });
+
+  const totalFormatted = formatMadPrice(totalMad, locale);
+
+  if (locale === 'ar') {
+    return [
+      'سلام NovaStream، بغيت نطلب هاد الألعاب / الخدمات:',
+      ...lines,
+      `المجموع: ${totalFormatted}`,
+      'واش متوفرين دابا؟',
+    ].join('\n');
+  }
+
+  if (locale === 'fr') {
+    return [
+      'Bonjour NovaStream ! Je souhaite commander les articles suivants :',
+      ...lines,
+      `Total : ${totalFormatted}`,
+      'Sont-ils disponibles ?',
+    ].join('\n');
+  }
+
+  return [
+    'Hello NovaStream! I would like to order the following items:',
+    ...lines,
+    `Total: ${totalFormatted}`,
+    'Are these available?',
+  ].join('\n');
+}
+
+export function buildWhatsAppCartOrderUrl(params: WhatsAppCartOrderParams): string {
+  const cleanPhone = sanitizeWhatsAppPhone(params.phoneNumber);
+  const message = buildWhatsAppCartOrderMessage(params);
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
 

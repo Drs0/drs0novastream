@@ -72,6 +72,44 @@
   gap: 0.75rem;
 }
 
+.cartBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding-inline: 0.75rem;
+  border-radius: $radius-md;
+  border: 1px solid $color-border-subtle;
+  background: rgba(17, 27, 51, 0.75);
+  color: $color-text-primary;
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  @include focus-ring;
+
+  &:hover {
+    border-color: $color-accent-cyan;
+    color: $color-accent-cyan-hover;
+  }
+}
+
+.cartBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding-inline: 0.35rem;
+  border-radius: $radius-pill;
+  background: $color-accent-cyan;
+  color: #031124;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
 .mobileMenuBtn {
   display: inline-flex;
   align-items: center;

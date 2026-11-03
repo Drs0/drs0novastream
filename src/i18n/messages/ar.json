@@ -167,6 +167,23 @@
     "errorTitle": "وقع شي مشكل",
     "errorText": "ما قدرناش نتيليشارجيو هاد الصفحة دابا. عاود جرب من بعد.",
     "backToServices": "رجع للخدمات"
+  },
+  "cart": {
+    "title": "السلة ديالك",
+    "openCart": "حل السلة",
+    "closeCart": "سد السلة",
+    "addToCart": "زيد للسلة",
+    "addedToCart": "تزاد للسلة!",
+    "viewCartCount": "شوف السلة ({count})",
+    "emptyTitle": "السلة ديالك خاوية",
+    "emptyDescription": "زيد بزاف ديال الألعاب أو الخدمات للسلة باش تصيفط طلب واحد مجموع فالواتساب.",
+    "removeItem": "حيّد من السلة",
+    "decreaseQty": "نقص الكمية",
+    "increaseQty": "زيد الكمية",
+    "totalLabel": "المجموع",
+    "orderCartOnWhatsapp": "طلب السلة عبر واتساب",
+    "clearCart": "فرّغ السلة",
+    "cartDisclaimer": "كيصيفط ميساج واحد فالواتساب فيه كاع الألعاب اللي اختاريتي."
   }
 }
 

@@ -5,6 +5,8 @@ import { getActiveLocale } from '@/i18n/request';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { LocaleDocumentSync } from '@/components/layout/LocaleDocumentSync';
+import { CartProvider } from '@/components/storefront/CartContext';
+import { CartDrawer } from '@/components/storefront/CartDrawer';
 import { getPublicSiteSettings } from '@/lib/catalog/repository';
 
 export default async function StorefrontLayout({
@@ -20,12 +22,15 @@ export default async function StorefrontLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <LocaleDocumentSync locale={locale} />
-      <div dir={locale === 'ar' ? 'rtl' : 'ltr'} lang={locale}>
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter settings={settings} />
-      </div>
+      <CartProvider whatsappNumber={settings.whatsappNumber} locale={locale}>
+        <LocaleDocumentSync locale={locale} />
+        <div dir={locale === 'ar' ? 'rtl' : 'ltr'} lang={locale}>
+          <SiteHeader />
+          <main>{children}</main>
+          <SiteFooter settings={settings} />
+          <CartDrawer />
+        </div>
+      </CartProvider>
     </NextIntlClientProvider>
   );
 }

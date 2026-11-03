@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import type { LocalizedService } from '@/types/catalog';
 import type { Locale } from '@/types/database';
 import { formatMadPrice } from '@/lib/formatters';
+import { QuickAddToCartButton } from './QuickAddToCartButton';
 import styles from './ServiceCard.module.scss';
 
 interface ServiceCardProps {
@@ -15,6 +16,8 @@ export function ServiceCard({ service, locale }: ServiceCardProps) {
   const t = useTranslations('catalog');
   const { priceSummary } = service;
   const isAvailable = priceSummary.availableCount > 0;
+  const defaultAvailableVariant =
+    service.variants.find((v) => v.is_available) ?? null;
 
   let priceText = '—';
   if (priceSummary.minPriceMad !== null) {
@@ -71,10 +74,19 @@ export function ServiceCard({ service, locale }: ServiceCardProps) {
 
         <div className={styles.footerRow}>
           <span className={styles.priceLabel}>{priceText}</span>
-          <Link href={`/services/${service.slug}`} className={styles.ctaBtn}>
-            <span>{t('viewDetails')}</span>
-            <ArrowRight size={15} className="directionalIcon" />
-          </Link>
+          <div className={styles.footerActions}>
+            <QuickAddToCartButton
+              serviceId={service.id}
+              serviceSlug={service.slug}
+              serviceName={service.name}
+              coverImagePath={service.coverImagePath}
+              defaultVariant={defaultAvailableVariant}
+            />
+            <Link href={`/services/${service.slug}`} className={styles.ctaBtn}>
+              <span>{t('viewDetails')}</span>
+              <ArrowRight size={15} className="directionalIcon" />
+            </Link>
+          </div>
         </div>
       </div>
     </article>

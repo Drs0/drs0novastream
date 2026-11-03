@@ -4,14 +4,17 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { Link } from '@/i18n/routing';
-import { Menu, X } from 'lucide-react';
+import { Menu, ShoppingCart, X } from 'lucide-react';
+import { useCart } from '@/components/storefront/CartContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import styles from './SiteHeader.module.scss';
 
 export function SiteHeader() {
   const t = useTranslations('nav');
+  const cartT = useTranslations('cart');
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { totalItems, openCart } = useCart();
 
   const links = [
     { href: '/', label: t('home') },
@@ -56,6 +59,17 @@ export function SiteHeader() {
         </nav>
 
         <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.cartBtn}
+            onClick={openCart}
+            aria-label={cartT('openCart')}
+          >
+            <ShoppingCart size={18} />
+            {totalItems > 0 && (
+              <span className={styles.cartBadge}>{totalItems}</span>
+            )}
+          </button>
           <LanguageSwitcher />
           <button
             type="button"

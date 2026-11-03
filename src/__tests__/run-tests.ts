@@ -19,6 +19,8 @@ import {
   resolveExactVariant,
 } from '../lib/catalog/pricing';
 import {
+  buildWhatsAppCartOrderMessage,
+  buildWhatsAppCartOrderUrl,
   buildWhatsAppOrderMessage,
   buildWhatsAppOrderUrl,
 } from '../lib/whatsapp';
@@ -466,6 +468,57 @@ async function runAllTests() {
       '22222222-2222-4222-8222-222222222208'
     );
     assert.ok(reviews.some((r) => r.reviewer_name === 'Tariq B.'));
+  });
+
+  await test('15. Multi-game Cart WhatsApp message generator combines multiple games into one message with total MAD price', () => {
+    const ps5ExtraPrimary = SEED_VARIANTS.find(
+      (v) => v.id === '33333333-3333-4333-8333-333333333305'
+    )!; // 350 DH
+    const gta6Ps5Primary = SEED_VARIANTS.find(
+      (v) => v.id === '33333333-3333-4333-8333-333333333410'
+    )!; // 600 DH
+
+    const cartItems = [
+      {
+        serviceName: 'PlayStation Plus',
+        variant: ps5ExtraPrimary,
+        quantity: 1,
+      },
+      {
+        serviceName: 'GTA VI',
+        variant: gta6Ps5Primary,
+        quantity: 2,
+      },
+    ];
+
+    const msgEn = buildWhatsAppCartOrderMessage({
+      locale: 'en',
+      items: cartItems,
+    });
+    assert.ok(msgEn.includes('1. PlayStation Plus Extra (PS5, Primary, 12 months) — 350 DH'));
+    assert.ok(msgEn.includes('2. GTA VI Standard (PS5, Primary) ×2 (600 DH each) — 1200 DH'));
+    assert.ok(msgEn.includes('Total: 1550 DH'));
+
+    const msgFr = buildWhatsAppCartOrderMessage({
+      locale: 'fr',
+      items: cartItems,
+    });
+    assert.ok(msgFr.includes('1. PlayStation Plus Extra (PS5, Principal, 12 mois) — 350 DH'));
+    assert.ok(msgFr.includes('Total : 1550 DH'));
+
+    const msgAr = buildWhatsAppCartOrderMessage({
+      locale: 'ar',
+      items: cartItems,
+    });
+    assert.ok(msgAr.includes('سلام NovaStream، بغيت نطلب هاد الألعاب / الخدمات:'));
+    assert.ok(msgAr.includes('المجموع: 1550 درهم'));
+
+    const cartWaUrl = buildWhatsAppCartOrderUrl({
+      phoneNumber: '+212 600-000000',
+      locale: 'en',
+      items: cartItems,
+    });
+    assert.ok(cartWaUrl.startsWith('https://wa.me/212600000000?text='));
   });
 
   console.log(`\nAll ${passed} test suites passed successfully!`);

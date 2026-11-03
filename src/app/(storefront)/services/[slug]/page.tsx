@@ -110,7 +110,10 @@ export default async function ServiceDetailPage({
           </div>
 
           <VariantSelector
+            serviceId={service.id}
+            serviceSlug={service.slug}
             serviceName={service.name}
+            coverImagePath={service.coverImagePath}
             variants={service.variants}
             locale={locale}
             whatsappNumber={settings.whatsappNumber}
