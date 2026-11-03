@@ -1,11 +1,69 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { Star } from 'lucide-react';
 import type { Locale, ServiceReviewRow } from '@/types/database';
 import { submitServiceReviewAction } from '@/app/(storefront)/services/[slug]/actions';
 import styles from './ServiceReviews.module.scss';
+
+const REVIEWS_STORAGE_KEY = 'novastream_reviews_v1';
+
+function mergeClientReviews(
+  primary: ServiceReviewRow[],
+  secondary: ServiceReviewRow[],
+  serviceId: string
+): ServiceReviewRow[] {
+  const byKey = new Map<string, ServiceReviewRow>();
+  const seenIds = new Set<string>();
+
+  for (const r of [...primary, ...secondary]) {
+    if (!r || !r.id || r.service_id !== serviceId) continue;
+    if (seenIds.has(r.id)) continue;
+    const contentKey = `${r.service_id}::${r.reviewer_name.trim().toLowerCase()}::${r.rating}::${r.comment.trim()}`;
+    if (!byKey.has(contentKey)) {
+      byKey.set(contentKey, r);
+      seenIds.add(r.id);
+    }
+  }
+
+  return Array.from(byKey.values()).sort((a, b) =>
+    b.created_at.localeCompare(a.created_at)
+  );
+}
+
+function readStoredReviewsForService(serviceId: string): ServiceReviewRow[] {
+  try {
+    const raw = window.localStorage.getItem(REVIEWS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return (parsed as ServiceReviewRow[]).filter(
+      (r) => r && r.service_id === serviceId
+    );
+  } catch {
+    return [];
+  }
+}
+
+function persistReviewsForService(
+  serviceId: string,
+  serviceReviews: ServiceReviewRow[]
+): void {
+  try {
+    const raw = window.localStorage.getItem(REVIEWS_STORAGE_KEY);
+    const allStored: ServiceReviewRow[] = raw ? JSON.parse(raw) : [];
+    const others = Array.isArray(allStored)
+      ? allStored.filter((r) => r && r.service_id !== serviceId)
+      : [];
+    window.localStorage.setItem(
+      REVIEWS_STORAGE_KEY,
+      JSON.stringify([...serviceReviews, ...others])
+    );
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 interface ServiceReviewsProps {
   serviceId: string;
@@ -29,6 +87,15 @@ export function ServiceReviews({
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stored = readStoredReviewsForService(serviceId);
+    const merged = mergeClientReviews(initialReviews, stored, serviceId);
+    setReviews(merged);
+    if (merged.length > 0) {
+      persistReviewsForService(serviceId, merged);
+    }
+  }, [serviceId, initialReviews]);
 
   const totalCount = reviews.length;
   const averageRating =
@@ -67,7 +134,11 @@ export function ServiceReviews({
         return;
       }
 
-      setReviews((prev) => [result.review!, ...prev]);
+      setReviews((prev) => {
+        const next = mergeClientReviews([result.review!], prev, serviceId);
+        persistReviewsForService(serviceId, next);
+        return next;
+      });
       setName('');
       setRating(5);
       setComment('');

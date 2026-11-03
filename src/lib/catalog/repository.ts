@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import type {
   AdminDashboardStats,
   LocalizedCategory,
@@ -48,6 +51,56 @@ const globalForMock = globalThis as unknown as {
   __novastreamMockStore?: MockCatalogStore;
 };
 
+const REVIEWS_CACHE_FILE = path.join(
+  os.tmpdir(),
+  'novastream-reviews-store.json'
+);
+
+function mergeReviewsList(
+  primary: ServiceReviewRow[],
+  secondary: ServiceReviewRow[]
+): ServiceReviewRow[] {
+  const byKey = new Map<string, ServiceReviewRow>();
+  const seenIds = new Set<string>();
+
+  for (const r of [...primary, ...secondary]) {
+    if (!r || !r.id || !r.service_id) continue;
+    if (seenIds.has(r.id)) continue;
+    const contentKey = `${r.service_id}::${r.reviewer_name.trim().toLowerCase()}::${r.rating}::${r.comment.trim()}`;
+    if (!byKey.has(contentKey)) {
+      byKey.set(contentKey, r);
+      seenIds.add(r.id);
+    }
+  }
+
+  return Array.from(byKey.values()).sort((a, b) =>
+    b.created_at.localeCompare(a.created_at)
+  );
+}
+
+function readSharedReviews(fallback: ServiceReviewRow[]): ServiceReviewRow[] {
+  try {
+    if (fs.existsSync(REVIEWS_CACHE_FILE)) {
+      const raw = fs.readFileSync(REVIEWS_CACHE_FILE, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return mergeReviewsList(parsed as ServiceReviewRow[], fallback);
+      }
+    }
+  } catch {
+    // Ignore file read errors
+  }
+  return mergeReviewsList([], fallback);
+}
+
+function writeSharedReviews(reviews: ServiceReviewRow[]): void {
+  try {
+    fs.writeFileSync(REVIEWS_CACHE_FILE, JSON.stringify(reviews), 'utf8');
+  } catch {
+    // Ignore file write errors
+  }
+}
+
 function getMockStore(): MockCatalogStore {
   if (!globalForMock.__novastreamMockStore) {
     globalForMock.__novastreamMockStore = {
@@ -56,13 +109,13 @@ function getMockStore(): MockCatalogStore {
       services: structuredClone(SEED_SERVICES),
       serviceTranslations: structuredClone(SEED_SERVICE_TRANSLATIONS),
       variants: structuredClone(SEED_VARIANTS),
-      reviews: structuredClone(SEED_SERVICE_REVIEWS),
+      reviews: readSharedReviews(SEED_SERVICE_REVIEWS),
       siteSettings: structuredClone(SEED_SITE_SETTINGS),
     };
   }
-  if (!globalForMock.__novastreamMockStore.reviews) {
-    globalForMock.__novastreamMockStore.reviews = structuredClone(SEED_SERVICE_REVIEWS);
-  }
+  globalForMock.__novastreamMockStore.reviews = readSharedReviews(
+    globalForMock.__novastreamMockStore.reviews ?? SEED_SERVICE_REVIEWS
+  );
   return globalForMock.__novastreamMockStore;
 }
 
@@ -327,6 +380,8 @@ export async function getPublicServiceBySlug(
 export async function getPublicServiceReviews(
   serviceId: string
 ): Promise<ServiceReviewRow[]> {
+  const store = getMockStore();
+  const localForService = store.reviews.filter((r) => r.service_id === serviceId);
   const { isConfigured } = getSupabaseEnv();
 
   if (isConfigured) {
@@ -340,7 +395,11 @@ export async function getPublicServiceReviews(
           .order('created_at', { ascending: false });
 
         if (!error && data) {
-          return data as ServiceReviewRow[];
+          const merged = mergeReviewsList(
+            data as ServiceReviewRow[],
+            localForService
+          );
+          return merged;
         }
       }
     } catch {
@@ -348,10 +407,9 @@ export async function getPublicServiceReviews(
     }
   }
 
-  const store = getMockStore();
-  return store.reviews
-    .filter((r) => r.service_id === serviceId)
-    .sort((a, b) => b.created_at.localeCompare(a.created_at));
+  return localForService.sort((a, b) =>
+    b.created_at.localeCompare(a.created_at)
+  );
 }
 
 export async function createPublicServiceReview(input: {
@@ -364,6 +422,8 @@ export async function createPublicServiceReview(input: {
   const cleanRating = Math.min(5, Math.max(1, Math.round(input.rating)));
   const cleanComment = input.comment.trim();
   const { isConfigured } = getSupabaseEnv();
+
+  let createdRow: ServiceReviewRow | null = null;
 
   if (isConfigured) {
     try {
@@ -381,7 +441,7 @@ export async function createPublicServiceReview(input: {
           .single();
 
         if (!error && data) {
-          return data as ServiceReviewRow;
+          createdRow = data as ServiceReviewRow;
         }
       }
     } catch {
@@ -390,7 +450,7 @@ export async function createPublicServiceReview(input: {
   }
 
   const store = getMockStore();
-  const newReview: ServiceReviewRow = {
+  const newReview: ServiceReviewRow = createdRow ?? {
     id: crypto.randomUUID(),
     service_id: input.service_id,
     reviewer_name: cleanName,
@@ -398,7 +458,9 @@ export async function createPublicServiceReview(input: {
     comment: cleanComment,
     created_at: new Date().toISOString(),
   };
-  store.reviews.unshift(newReview);
+
+  store.reviews = mergeReviewsList([newReview], store.reviews);
+  writeSharedReviews(store.reviews);
   return newReview;
 }
 

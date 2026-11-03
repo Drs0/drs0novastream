@@ -138,6 +138,7 @@ export default async function ServiceDetailPage({
       </div>
 
       <ServiceReviews
+        key={service.id}
         serviceId={service.id}
         serviceSlug={service.slug}
         initialReviews={reviews}
