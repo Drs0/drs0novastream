@@ -33,6 +33,9 @@ export function ServiceGallery({
           src={list[activeIndex] ?? fallback}
           alt={imageAlt}
           className={styles.mainImage}
+          decoding="async"
+          width={900}
+          height={900}
         />
       </div>
 

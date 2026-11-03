@@ -35,6 +35,9 @@ export function ServiceCard({ service, locale }: ServiceCardProps) {
           alt={service.imageAlt}
           className={styles.coverImg}
           loading="lazy"
+          decoding="async"
+          width={900}
+          height={900}
         />
         <div className={styles.badgesOverlay}>
           {service.isFeatured && (

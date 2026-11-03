@@ -72,3 +72,20 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+/**
+ * Resolves a localized offer image path (`/images/offers/{en|fr|ar}/<file>`)
+ * to match the requested locale so Arabic, English, and French visitors
+ * automatically see the 1:1 cover and gallery image in their active language.
+ */
+export function localizeOfferImagePath(
+  imagePath: string | null | undefined,
+  locale: Locale
+): string | null {
+  if (!imagePath) return null;
+  if (/^\/images\/offers\/(en|fr|ar)\//.test(imagePath)) {
+    return imagePath.replace(/^\/images\/offers\/(en|fr|ar)\//, `/images/offers/${locale}/`);
+  }
+  return imagePath;
+}
+
+

@@ -13,7 +13,10 @@ import type {
   ServiceVariantRow,
   SiteSettingRow,
 } from '@/types/database';
-import { getTranslationFallbackOrder } from '@/lib/formatters';
+import {
+  getTranslationFallbackOrder,
+  localizeOfferImagePath,
+} from '@/lib/formatters';
 import { computeServicePriceSummary } from './pricing';
 import {
   SEED_CATEGORIES,
@@ -144,6 +147,20 @@ export function resolveLocalizedService(
 
   const resolvedName = chosen?.name ?? service.name;
   const resolvedShortDesc = chosen?.short_description ?? service.short_description;
+  const localizedCover = localizeOfferImagePath(
+    service.cover_image_path,
+    requestedLocale
+  );
+  const rawGallery = service.gallery_paths ?? [];
+  const orderedGallery = Array.from(
+    new Set(
+      [
+        localizedCover,
+        ...rawGallery.map((p) => localizeOfferImagePath(p, requestedLocale) ?? p),
+        ...rawGallery,
+      ].filter((p): p is string => Boolean(p))
+    )
+  );
 
   return {
     id: service.id,
@@ -154,8 +171,8 @@ export function resolveLocalizedService(
     name: resolvedName,
     shortDescription: resolvedShortDesc,
     description: chosen?.description ?? service.description,
-    coverImagePath: service.cover_image_path,
-    galleryPaths: service.gallery_paths ?? [],
+    coverImagePath: localizedCover,
+    galleryPaths: orderedGallery,
     imageAlt: chosen?.image_alt ?? resolvedName,
     status: service.status,
     isFeatured: service.is_featured,

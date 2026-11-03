@@ -9,6 +9,7 @@ import {
   formatDurationMonths,
   formatMadPrice,
   getTranslationFallbackOrder,
+  localizeOfferImagePath,
 } from '../lib/formatters';
 import {
   checkOptionCompatibility,
@@ -379,6 +380,45 @@ async function runAllTests() {
     assert.equal(formatDurationMonths(3, 'ar'), '3 شهور');
     assert.equal(formatAccessType('Primary', 'ar'), 'برايمري');
     assert.equal(formatAccessType('Secondary', 'ar'), 'سيكندري');
+  });
+
+  await test('13. Migration 0003 and localized 1:1 offer images (EN, FR, AR) exist and resolve per locale', async () => {
+    const mig3Path = path.join(
+      process.cwd(),
+      'supabase/migrations/0003_offers_catalog.sql'
+    );
+    assert.ok(fs.existsSync(mig3Path), '0003_offers_catalog.sql must exist');
+    const mig3Sql = fs.readFileSync(mig3Path, 'utf8');
+    assert.ok(mig3Sql.includes('gta-vi'), 'Migration must include GTA VI offer');
+    assert.ok(mig3Sql.includes('ea-sports-fc-27'), 'Migration must include EA Sports FC 27 offer');
+    assert.ok(mig3Sql.includes('elden-ring'), 'Migration must include Elden Ring offer');
+
+    for (const loc of ['en', 'fr', 'ar'] as const) {
+      const imgPath = path.join(
+        process.cwd(),
+        `public/images/offers/${loc}/gta-vi.jpg`
+      );
+      assert.ok(fs.existsSync(imgPath), `Localized 1:1 image must exist for ${loc}`);
+      const stat = fs.statSync(imgPath);
+      assert.ok(
+        stat.size > 10_000 && stat.size < 300_000,
+        `Image for ${loc} must be web-optimized (<300KB)`
+      );
+    }
+
+    assert.equal(
+      localizeOfferImagePath('/images/offers/fr/gta-vi.jpg', 'ar'),
+      '/images/offers/ar/gta-vi.jpg'
+    );
+    assert.equal(
+      localizeOfferImagePath('/images/offers/fr/gta-vi.jpg', 'en'),
+      '/images/offers/en/gta-vi.jpg'
+    );
+
+    const arServices = await getPublicServices('ar');
+    const gtaAr = arServices.find((s) => s.slug === 'gta-vi');
+    assert.ok(gtaAr, 'GTA VI must be returned in public services');
+    assert.equal(gtaAr.coverImagePath, '/images/offers/ar/gta-vi.jpg');
   });
 
   console.log(`\nAll ${passed} test suites passed successfully!`);
