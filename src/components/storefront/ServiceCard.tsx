@@ -81,6 +81,7 @@ export function ServiceCard({ service, locale }: ServiceCardProps) {
               serviceName={service.name}
               coverImagePath={service.coverImagePath}
               defaultVariant={defaultAvailableVariant}
+              whatsappNumber={service.categoryWhatsappNumber}
             />
             <Link href={`/services/${service.slug}`} className={styles.ctaBtn}>
               <span>{t('viewDetails')}</span>

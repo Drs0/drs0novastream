@@ -25,6 +25,7 @@ export function CategoryManagerClient({
   const [editingId, setEditingId] = useState<string | undefined>(undefined);
   const [slug, setSlug] = useState('');
   const [imagePath, setImagePath] = useState('/images/categories/ps-plus.svg');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
   const [sortOrder, setSortOrder] = useState(categories.length + 1);
   const [isActive, setIsActive] = useState(true);
   const [activeTab, setActiveTab] = useState<Locale>('fr');
@@ -64,6 +65,7 @@ export function CategoryManagerClient({
     setEditingId(cat.id);
     setSlug(cat.slug);
     setImagePath(cat.imagePath ?? '/images/categories/digital.svg');
+    setWhatsappNumber(cat.whatsappNumber ?? '');
     setSortOrder(cat.sortOrder);
     setIsActive(cat.isActive);
     setTranslations({
@@ -86,6 +88,7 @@ export function CategoryManagerClient({
     setEditingId(undefined);
     setSlug('');
     setImagePath('/images/categories/digital.svg');
+    setWhatsappNumber('');
     setSortOrder(categories.length + 1);
     setIsActive(true);
     setTranslations({
@@ -109,6 +112,7 @@ export function CategoryManagerClient({
       description:
         translations.fr.description || translations.en.description || null,
       image_path: imagePath.trim() || null,
+      whatsapp_number: whatsappNumber.trim() || null,
       sort_order: sortOrder,
       is_active: isActive,
       translations: {
@@ -242,6 +246,19 @@ export function CategoryManagerClient({
             </div>
 
             <div className={styles.field}>
+              <label className={styles.label}>
+                WhatsApp Number (Optional — uses Site Settings if empty)
+              </label>
+              <input
+                type="text"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                placeholder="e.g. 212600000000"
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.field}>
               <label className={styles.label}>Sort Order</label>
               <input
                 type="number"
@@ -293,6 +310,7 @@ export function CategoryManagerClient({
                 <th>Order</th>
                 <th>Name (EN / FR / AR)</th>
                 <th>Slug</th>
+                <th>WhatsApp</th>
                 <th>Status</th>
                 <th>Translations</th>
                 <th>Actions</th>
@@ -311,6 +329,15 @@ export function CategoryManagerClient({
                   </td>
                   <td>
                     <code>{cat.slug}</code>
+                  </td>
+                  <td>
+                    {cat.whatsappNumber ? (
+                      <code>+{cat.whatsappNumber}</code>
+                    ) : (
+                      <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                        Site Default
+                      </span>
+                    )}
                   </td>
                   <td>
                     <span

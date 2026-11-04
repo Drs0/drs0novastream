@@ -112,6 +112,7 @@ export function VariantSelector({
       serviceName,
       coverImagePath,
       variant: selectedVariant,
+      whatsappNumber,
     });
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 1800);

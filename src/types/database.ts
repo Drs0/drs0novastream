@@ -10,6 +10,7 @@ export interface CategoryRow {
   slug: string;
   description: string | null;
   image_path: string | null;
+  whatsapp_number?: string | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;

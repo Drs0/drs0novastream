@@ -116,7 +116,9 @@ export default async function ServiceDetailPage({
             coverImagePath={service.coverImagePath}
             variants={service.variants}
             locale={locale}
-            whatsappNumber={settings.whatsappNumber}
+            whatsappNumber={
+              service.categoryWhatsappNumber?.trim() || settings.whatsappNumber
+            }
           />
         </div>
       </div>

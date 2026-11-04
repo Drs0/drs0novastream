@@ -15,6 +15,7 @@ export interface LocalizedCategory {
   name: string;
   description: string | null;
   imagePath: string | null;
+  whatsappNumber: string | null;
   sortOrder: number;
   isActive: boolean;
   resolvedLocale: Locale;
@@ -37,6 +38,7 @@ export interface LocalizedService {
   categoryId: string;
   categorySlug: string;
   categoryName: string;
+  categoryWhatsappNumber: string | null;
   slug: string;
   name: string;
   shortDescription: string | null;
@@ -74,6 +76,7 @@ export interface CartItem {
   coverImagePath: string | null;
   variant: ServiceVariantRow;
   quantity: number;
+  whatsappNumber?: string | null;
 }
 
 export interface PublicSiteSettings {

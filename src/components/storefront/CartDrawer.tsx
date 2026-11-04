@@ -40,8 +40,12 @@ export function CartDrawer() {
     return null;
   }
 
+  const effectiveCartWhatsapp =
+    items.find((item) => item.whatsappNumber?.trim())?.whatsappNumber?.trim() ||
+    whatsappNumber;
+
   const whatsappCheckoutUrl = buildWhatsAppCartOrderUrl({
-    phoneNumber: whatsappNumber,
+    phoneNumber: effectiveCartWhatsapp,
     locale,
     items: items.map((item) => ({
       serviceName: item.serviceName,

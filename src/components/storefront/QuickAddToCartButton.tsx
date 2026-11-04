@@ -13,6 +13,7 @@ interface QuickAddToCartButtonProps {
   serviceName: string;
   coverImagePath: string | null;
   defaultVariant: ServiceVariantRow | null;
+  whatsappNumber?: string | null;
 }
 
 export function QuickAddToCartButton({
@@ -21,6 +22,7 @@ export function QuickAddToCartButton({
   serviceName,
   coverImagePath,
   defaultVariant,
+  whatsappNumber = null,
 }: QuickAddToCartButtonProps) {
   const t = useTranslations('cart');
   const { addItem, getItemQuantity } = useCart();
@@ -41,6 +43,7 @@ export function QuickAddToCartButton({
       serviceName,
       coverImagePath,
       variant: defaultVariant,
+      whatsappNumber,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);

@@ -25,6 +25,7 @@ import {
   buildWhatsAppOrderUrl,
 } from '../lib/whatsapp';
 import {
+  categoryUpsertSchema,
   serviceReviewInputSchema,
   serviceUpsertSchema,
   serviceVariantInputSchema,
@@ -35,6 +36,7 @@ import {
   getPublicServiceReviews,
   getPublicServices,
   getPublicSiteSettings,
+  resolveLocalizedCategory,
   resolveLocalizedService,
 } from '../lib/catalog/repository';
 import { SEED_SERVICES, SEED_VARIANTS } from '../lib/catalog/seed-data';
@@ -519,6 +521,56 @@ async function runAllTests() {
       items: cartItems,
     });
     assert.ok(cartWaUrl.startsWith('https://wa.me/212600000000?text='));
+  });
+
+  await test('16. Category WhatsApp number overrides Website Settings when set and falls back when empty', () => {
+    const parsedWithPhone = categoryUpsertSchema.safeParse({
+      name: 'Streaming',
+      slug: 'streaming',
+      whatsapp_number: '+212 611-223344',
+      translations: {},
+    });
+    assert.equal(parsedWithPhone.success, true);
+    if (parsedWithPhone.success) {
+      assert.equal(parsedWithPhone.data.whatsapp_number, '212611223344');
+    }
+
+    const parsedEmptyPhone = categoryUpsertSchema.safeParse({
+      name: 'Streaming',
+      slug: 'streaming',
+      whatsapp_number: '   ',
+      translations: {},
+    });
+    assert.equal(parsedEmptyPhone.success, true);
+    if (parsedEmptyPhone.success) {
+      assert.equal(parsedEmptyPhone.data.whatsapp_number, null);
+    }
+
+    const streamingCategory = resolveLocalizedCategory(
+      {
+        id: '11111111-1111-4111-8111-111111111104',
+        name: 'Streaming',
+        slug: 'streaming',
+        description: null,
+        image_path: null,
+        whatsapp_number: '212611223344',
+        sort_order: 1,
+        is_active: true,
+        created_at: '2026-11-01T10:00:00Z',
+      },
+      [],
+      'en'
+    );
+    assert.equal(streamingCategory.whatsappNumber, '212611223344');
+
+    const serviceInStreaming = resolveLocalizedService(
+      SEED_SERVICES[0],
+      [],
+      [],
+      streamingCategory,
+      'en'
+    );
+    assert.equal(serviceInStreaming.categoryWhatsappNumber, '212611223344');
   });
 
   console.log(`\nAll ${passed} test suites passed successfully!`);

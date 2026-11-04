@@ -388,6 +388,7 @@ export async function saveCategoryAction(
       slug: data.slug,
       description: data.description ?? null,
       image_path: data.image_path ?? null,
+      whatsapp_number: data.whatsapp_number ?? null,
       sort_order: data.sort_order,
       is_active: data.is_active,
     };
@@ -440,6 +441,7 @@ export async function saveCategoryAction(
     slug: data.slug,
     description: data.description ?? null,
     image_path: data.image_path ?? null,
+    whatsapp_number: data.whatsapp_number ?? null,
     sort_order: data.sort_order,
     is_active: data.is_active,
     created_at:

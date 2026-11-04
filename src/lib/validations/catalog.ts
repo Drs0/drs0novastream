@@ -169,6 +169,21 @@ export const categoryUpsertSchema = z.object({
   slug: slugSchema,
   description: z.string().trim().max(600).nullable().optional(),
   image_path: z.string().trim().max(500).nullable().optional(),
+  whatsapp_number: z
+    .string()
+    .trim()
+    .max(30)
+    .nullable()
+    .optional()
+    .transform((v) => {
+      if (!v) return null;
+      const digits = v.replace(/[^0-9]/g, '');
+      return digits.length > 0 ? digits : null;
+    })
+    .refine(
+      (v) => v === null || /^[1-9][0-9]{7,14}$/.test(v),
+      'WhatsApp number must be in international format (e.g. 212600000000) or left empty'
+    ),
   sort_order: z.number().int().default(0),
   is_active: z.boolean().default(true),
   translations: z.object({
