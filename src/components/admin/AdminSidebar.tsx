@@ -17,6 +17,7 @@ export function AdminSidebar() {
 
   const navItems = [
     { href: '/admin', label: 'Dashboard Overview', icon: LayoutDashboard },
+    { href: '/admin/services', label: 'Services', icon: Package },
     { href: '/admin/services/new', label: 'New Service', icon: PlusCircle },
     { href: '/admin/categories', label: 'Categories', icon: FolderKanban },
     { href: '/admin/settings', label: 'Website Settings', icon: Settings },
@@ -34,8 +35,8 @@ export function AdminSidebar() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
-              item.href === '/admin'
-                ? pathname === '/admin'
+              item.href === '/admin' || item.href === '/admin/services'
+                ? pathname === item.href
                 : pathname.startsWith(item.href);
 
             return (

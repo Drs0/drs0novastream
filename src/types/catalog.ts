@@ -9,6 +9,12 @@ import type {
   ServiceVariantRow,
 } from './database';
 
+export interface ServiceWithReviewStats {
+  service: LocalizedService;
+  reviewCount: number;
+  averageRating: number;
+}
+
 export interface LocalizedCategory {
   id: string;
   slug: string;

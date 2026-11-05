@@ -5,6 +5,7 @@ import {
   getPublicCategories,
   getPublicServices,
   getPublicSiteSettings,
+  getTopReviewedServices,
 } from '@/lib/catalog/repository';
 import { buildLocalizedMetadata } from '@/lib/seo';
 import { HeroSection } from '@/components/storefront/HeroSection';
@@ -28,10 +29,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const locale = await getActiveLocale();
 
-  const [categories, services, settings, homeT] = await Promise.all([
+  const [categories, services, settings, topReviewed, homeT] = await Promise.all([
     getPublicCategories(locale),
     getPublicServices(locale),
     getPublicSiteSettings(),
+    getTopReviewedServices(locale, 6),
     getTranslations({ locale, namespace: 'home' }),
   ]);
 
@@ -41,7 +43,11 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection locale={locale} whatsappNumber={settings.whatsappNumber} />
+      <HeroSection
+        locale={locale}
+        whatsappNumber={settings.whatsappNumber}
+        topReviewed={topReviewed}
+      />
 
       <CategoryGrid categories={categories} />
 

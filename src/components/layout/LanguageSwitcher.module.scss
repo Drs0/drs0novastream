@@ -1,17 +1,24 @@
 @use '../../styles/tokens' as *;
 @use '../../styles/mixins' as *;
 
-.switcher {
-  display: inline-flex;
+.desktopSwitcher {
+  display: none;
   align-items: center;
   gap: 0.25rem;
   padding: 0.2rem;
   background: rgba(12, 19, 36, 0.85);
   border: 1px solid $color-border-subtle;
   border-radius: $radius-pill;
+
+  @media (min-width: $breakpoint-md) {
+    display: inline-flex;
+  }
 }
 
 .langBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   padding-block: 0.35rem;
   padding-inline: 0.7rem;
   border-radius: $radius-pill;
@@ -33,5 +40,119 @@
   background: linear-gradient(135deg, $color-accent-cyan, $color-accent-blue);
   color: #04101f;
   font-weight: 700;
+}
+
+.flagSvg {
+  width: 1.35rem;
+  height: 0.96rem;
+  border-radius: 2px;
+  display: block;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.mobileDropdown {
+  position: relative;
+  display: inline-flex;
+
+  @media (min-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.mobileTriggerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding-inline: 0.65rem;
+  border-radius: $radius-md;
+  border: 1px solid $color-border-subtle;
+  background: rgba(17, 27, 51, 0.75);
+  color: $color-text-primary;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  @include focus-ring;
+
+  &:hover {
+    border-color: $color-accent-cyan;
+  }
+}
+
+.chevron {
+  color: $color-text-secondary;
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdownFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.95);
+  }
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  inset-inline-end: 0;
+  z-index: 70;
+  padding: 0.35rem;
+  border-radius: $radius-md;
+  background: $color-bg-surface;
+  border: 1px solid $color-border-subtle;
+  box-shadow: $shadow-card;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 3.1rem;
+  animation: dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+.dropdownMenuClosing {
+  animation: dropdownFadeOut 0.15s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  pointer-events: none;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.65rem;
+  border-radius: $radius-sm;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  @include focus-ring;
+
+  &:hover {
+    background: rgba(6, 182, 212, 0.12);
+  }
+}
+
+.dropdownItemActive {
+  background: rgba(6, 182, 212, 0.18);
+  border-color: $color-border-accent;
 }
 

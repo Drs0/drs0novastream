@@ -20,7 +20,9 @@
     "headline": "Vos Services Numériques & Gaming au Même Endroit",
     "description": "Trouvez le service numérique qu’il vous faut, comparez les prix exacts en Dirhams (DH), sélectionnez vos options et contactez-nous sur WhatsApp.",
     "primaryCta": "Voir les services",
-    "secondaryCta": "Contactez-nous"
+    "secondaryCta": "Contactez-nous",
+    "topRatedBadge": "Les Mieux Notés",
+    "reviewsLabel": "{count} avis"
   },
   "home": {
     "categoriesTitle": "Catégories de Services",

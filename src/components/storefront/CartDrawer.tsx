@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   MessageCircle,
@@ -36,7 +37,35 @@ export function CartDrawer() {
   } = useCart();
   const t = useTranslations('cart');
 
-  if (!isOpen) {
+  const [mounted, setMounted] = useState(isOpen);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setMounted(true);
+      setIsClosing(false);
+    } else if (mounted) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setMounted(false);
+        setIsClosing(false);
+      }, 260);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, mounted]);
+
+  useEffect(() => {
+    if (!mounted || isClosing) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        closeCart();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mounted, isClosing, closeCart]);
+
+  if (!mounted) {
     return null;
   }
 
@@ -56,14 +85,14 @@ export function CartDrawer() {
 
   return (
     <div
-      className={styles.backdrop}
-      onClick={closeCart}
+      className={`${styles.backdrop} ${isClosing ? styles.backdropClosing : ''}`}
+      onClick={() => !isClosing && closeCart()}
       role="dialog"
       aria-modal="true"
       aria-label={t('title')}
     >
       <aside
-        className={styles.drawer}
+        className={`${styles.drawer} ${isClosing ? styles.drawerClosing : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.header}>

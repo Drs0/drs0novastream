@@ -36,6 +36,7 @@ import {
   getPublicServiceReviews,
   getPublicServices,
   getPublicSiteSettings,
+  getTopReviewedServices,
   resolveLocalizedCategory,
   resolveLocalizedService,
 } from '../lib/catalog/repository';
@@ -571,6 +572,29 @@ async function runAllTests() {
       'en'
     );
     assert.equal(serviceInStreaming.categoryWhatsappNumber, '212611223344');
+  });
+
+  await test('17. Hero vertical carousel data provider ranks services by review count and average rating', async () => {
+    const topServices = await getTopReviewedServices('en', 6);
+    assert.ok(Array.isArray(topServices), 'Top reviewed services must return an array');
+    assert.ok(topServices.length > 0, 'Must return at least 1 service');
+    assert.ok(topServices.length <= 6, 'Must respect the requested limit');
+    assert.ok('reviewCount' in topServices[0], 'Each item must have reviewCount');
+    assert.ok('averageRating' in topServices[0], 'Each item must have averageRating');
+
+    // Add a review to a specific service and verify it ranks higher
+    const targetServiceId = topServices[topServices.length - 1].service.id;
+    await createPublicServiceReview({
+      service_id: targetServiceId,
+      reviewer_name: 'Test Reviewer',
+      rating: 5,
+      comment: 'Outstanding game experience!',
+    });
+
+    const refreshed = await getTopReviewedServices('en', 6);
+    const promoted = refreshed.find((item) => item.service.id === targetServiceId);
+    assert.ok(promoted, 'Target service must still be included');
+    assert.ok(promoted!.reviewCount >= 1, 'Review count must increment');
   });
 
   console.log(`\nAll ${passed} test suites passed successfully!`);

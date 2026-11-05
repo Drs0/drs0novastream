@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Save, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Save, Edit2, Trash2, Search, X } from 'lucide-react';
 import type { LocalizedCategory } from '@/types/catalog';
 import type { Locale } from '@/types/database';
 import { slugify } from '@/lib/formatters';
@@ -29,6 +29,20 @@ export function CategoryManagerClient({
   const [sortOrder, setSortOrder] = useState(categories.length + 1);
   const [isActive, setIsActive] = useState(true);
   const [activeTab, setActiveTab] = useState<Locale>('fr');
+  const [categorySearch, setCategorySearch] = useState('');
+
+  const filteredCategories = useMemo(() => {
+    const term = categorySearch.trim().toLowerCase();
+    if (!term) return categories;
+    return categories.filter((cat) => {
+      const matchName = cat.name.toLowerCase().includes(term);
+      const matchSlug = cat.slug.toLowerCase().includes(term);
+      const matchFr = cat.translations.fr?.name?.toLowerCase().includes(term);
+      const matchAr = cat.translations.ar?.name?.toLowerCase().includes(term);
+      const matchPhone = cat.whatsappNumber && cat.whatsappNumber.includes(term);
+      return matchName || matchSlug || matchFr || matchAr || matchPhone;
+    });
+  }, [categories, categorySearch]);
 
   const [translations, setTranslations] = useState<
     Record<Locale, { name: string; description: string }>
@@ -300,101 +314,141 @@ export function CategoryManagerClient({
 
       <div className={styles.panelCard}>
         <div className={styles.panelHeader}>
-          <h3 className={styles.panelTitle}>Existing Categories</h3>
+          <div>
+            <h3 className={styles.panelTitle}>Existing Categories</h3>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+              Showing {filteredCategories.length} of {categories.length} categories
+            </span>
+          </div>
+
+          <div className={styles.searchBox} style={{ maxWidth: '20rem' }}>
+            <Search size={15} className={styles.searchIcon} />
+            <input
+              type="text"
+              value={categorySearch}
+              onChange={(e) => setCategorySearch(e.target.value)}
+              placeholder="Search categories..."
+              className={styles.searchInput}
+            />
+            {categorySearch && (
+              <button
+                type="button"
+                onClick={() => setCategorySearch('')}
+                className={styles.clearSearchBtn}
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Order</th>
-                <th>Name (EN / FR / AR)</th>
-                <th>Slug</th>
-                <th>WhatsApp</th>
-                <th>Status</th>
-                <th>Translations</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((cat) => (
-                <tr key={cat.id}>
-                  <td>{cat.sortOrder}</td>
-                  <td>
-                    <strong>{cat.name}</strong>
-                    <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                      FR: {cat.translations.fr?.name ?? '—'} | AR:{' '}
-                      {cat.translations.ar?.name ?? '—'}
-                    </div>
-                  </td>
-                  <td>
-                    <code>{cat.slug}</code>
-                  </td>
-                  <td>
-                    {cat.whatsappNumber ? (
-                      <code>+{cat.whatsappNumber}</code>
-                    ) : (
-                      <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                        Site Default
-                      </span>
-                    )}
-                  </td>
-                  <td>
-                    <span
-                      className={`${styles.badge} ${
-                        cat.isActive
-                          ? styles.badgePublished
-                          : styles.badgeArchived
-                      }`}
-                    >
-                      {cat.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>
-                    {cat.missingLocales.length === 0 ? (
-                      <span
-                        className={`${styles.badge} ${styles.badgePublished}`}
-                      >
-                        EN • FR • AR
-                      </span>
-                    ) : (
-                      <span className={`${styles.badge} ${styles.badgeMissing}`}>
-                        Missing: {cat.missingLocales.join(', ').toUpperCase()}
-                      </span>
-                    )}
-                  </td>
-                  <td>
-                    <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
-                      <button
-                        type="button"
-                        onClick={() => handleSelectForEdit(cat)}
-                        className={styles.secondaryBtn}
-                        style={{
-                          minHeight: '2.1rem',
-                          padding: '0.25rem 0.65rem',
-                        }}
-                      >
-                        <Edit2 size={14} />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeleteTarget(cat)}
-                        className={styles.dangerBtn}
-                        style={{
-                          minHeight: '2.1rem',
-                          padding: '0.25rem 0.65rem',
-                        }}
-                      >
-                        <Trash2 size={14} />
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  </td>
+          {filteredCategories.length === 0 ? (
+            <div className={styles.emptyTable}>
+              <p>No categories match your search.</p>
+              <button
+                type="button"
+                onClick={() => setCategorySearch('')}
+                className={styles.secondaryBtn}
+                style={{ marginTop: '0.75rem' }}
+              >
+                Clear search
+              </button>
+            </div>
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Name (EN / FR / AR)</th>
+                  <th>Slug</th>
+                  <th>WhatsApp</th>
+                  <th>Status</th>
+                  <th>Translations</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredCategories.map((cat) => (
+                  <tr key={cat.id}>
+                    <td>{cat.sortOrder}</td>
+                    <td>
+                      <strong>{cat.name}</strong>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                        FR: {cat.translations.fr?.name ?? '—'} | AR:{' '}
+                        {cat.translations.ar?.name ?? '—'}
+                      </div>
+                    </td>
+                    <td>
+                      <code>{cat.slug}</code>
+                    </td>
+                    <td>
+                      {cat.whatsappNumber ? (
+                        <code>+{cat.whatsappNumber}</code>
+                      ) : (
+                        <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                          Site Default
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <span
+                        className={`${styles.badge} ${
+                          cat.isActive
+                            ? styles.badgePublished
+                            : styles.badgeArchived
+                        }`}
+                      >
+                        {cat.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td>
+                      {cat.missingLocales.length === 0 ? (
+                        <span
+                          className={`${styles.badge} ${styles.badgePublished}`}
+                        >
+                          EN • FR • AR
+                        </span>
+                      ) : (
+                        <span className={`${styles.badge} ${styles.badgeMissing}`}>
+                          Missing: {cat.missingLocales.join(', ').toUpperCase()}
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectForEdit(cat)}
+                          className={styles.secondaryBtn}
+                          style={{
+                            minHeight: '2.1rem',
+                            padding: '0.25rem 0.65rem',
+                          }}
+                        >
+                          <Edit2 size={14} />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteTarget(cat)}
+                          className={styles.dangerBtn}
+                          style={{
+                            minHeight: '2.1rem',
+                            padding: '0.25rem 0.65rem',
+                          }}
+                        >
+                          <Trash2 size={14} />
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 

@@ -1,6 +1,60 @@
 @use '../../styles/tokens' as *;
 @use '../../styles/mixins' as *;
 
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdropFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes drawerSlideInLTR {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawerSlideOutLTR {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes drawerSlideInRTL {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawerSlideOutRTL {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -9,6 +63,12 @@
   backdrop-filter: blur(6px);
   display: flex;
   justify-content: flex-end;
+  animation: backdropFadeIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.backdropClosing {
+  animation: backdropFadeOut 0.24s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+  pointer-events: none;
 }
 
 .drawer {
@@ -21,6 +81,19 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  animation: drawerSlideInLTR 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  :global([dir='rtl']) & {
+    animation-name: drawerSlideInRTL;
+  }
+}
+
+.drawerClosing {
+  animation: drawerSlideOutLTR 0.24s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+
+  :global([dir='rtl']) & {
+    animation-name: drawerSlideOutRTL;
+  }
 }
 
 .header {
@@ -109,6 +182,17 @@
   max-width: 20rem;
 }
 
+@keyframes itemAppear {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .itemCard {
   padding: 0.95rem;
   border-radius: $radius-md;
@@ -117,6 +201,7 @@
   display: flex;
   gap: 0.9rem;
   align-items: flex-start;
+  animation: itemAppear 0.2s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .itemThumb {

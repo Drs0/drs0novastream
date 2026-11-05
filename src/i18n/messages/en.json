@@ -20,7 +20,9 @@
     "headline": "Digital Services & Gaming in One Place",
     "description": "Find the digital service you want, compare exact prices in Moroccan Dirhams (DH), select your options, and contact us directly on WhatsApp.",
     "primaryCta": "View services",
-    "secondaryCta": "Contact us"
+    "secondaryCta": "Contact us",
+    "topRatedBadge": "Top Customer Rated",
+    "reviewsLabel": "{count} reviews"
   },
   "home": {
     "categoriesTitle": "Service Categories",

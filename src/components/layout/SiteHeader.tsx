@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { Link } from '@/i18n/routing';
@@ -15,6 +15,23 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems, openCart } = useCart();
+
+  const [menuMounted, setMenuMounted] = useState(mobileOpen);
+  const [menuClosing, setMenuClosing] = useState(false);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      setMenuMounted(true);
+      setMenuClosing(false);
+    } else if (menuMounted) {
+      setMenuClosing(true);
+      const timer = setTimeout(() => {
+        setMenuMounted(false);
+        setMenuClosing(false);
+      }, 220);
+      return () => clearTimeout(timer);
+    }
+  }, [mobileOpen, menuMounted]);
 
   const links = [
     { href: '/', label: t('home') },
@@ -83,8 +100,13 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {mobileOpen && (
-        <nav className={styles.mobileDrawer} aria-label="Mobile navigation">
+      {menuMounted && (
+        <nav
+          className={`${styles.mobileDrawer} ${
+            menuClosing ? styles.mobileDrawerClosing : ''
+          }`}
+          aria-label="Mobile navigation"
+        >
           {links.map((item) => (
             <Link
               key={item.href}

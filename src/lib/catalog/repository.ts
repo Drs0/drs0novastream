@@ -6,6 +6,7 @@ import type {
   LocalizedCategory,
   LocalizedService,
   PublicSiteSettings,
+  ServiceWithReviewStats,
 } from '@/types/catalog';
 import type {
   CategoryRow,
@@ -412,6 +413,79 @@ export async function getPublicServiceReviews(
   return localForService.sort((a, b) =>
     b.created_at.localeCompare(a.created_at)
   );
+}
+
+export async function getAllPublicReviews(): Promise<ServiceReviewRow[]> {
+  const store = getMockStore();
+  const localReviews = store.reviews ?? [];
+  const { isConfigured } = getSupabaseEnv();
+
+  if (isConfigured) {
+    try {
+      const supabase = await createSupabaseServerClient();
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('service_reviews')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          return mergeReviewsList(data as ServiceReviewRow[], localReviews);
+        }
+      }
+    } catch {
+      // Fall back gracefully
+    }
+  }
+
+  return [...localReviews].sort((a, b) =>
+    b.created_at.localeCompare(a.created_at)
+  );
+}
+
+export async function getTopReviewedServices(
+  locale: Locale,
+  limit = 6
+): Promise<ServiceWithReviewStats[]> {
+  const [services, allReviews] = await Promise.all([
+    getPublicServices(locale),
+    getAllPublicReviews(),
+  ]);
+
+  const statsMap = new Map<string, { count: number; totalRating: number }>();
+  for (const rev of allReviews) {
+    if (!rev?.service_id) continue;
+    const cur = statsMap.get(rev.service_id) || { count: 0, totalRating: 0 };
+    cur.count += 1;
+    cur.totalRating += rev.rating;
+    statsMap.set(rev.service_id, cur);
+  }
+
+  const withStats: ServiceWithReviewStats[] = services.map((s) => {
+    const stats = statsMap.get(s.id);
+    const count = stats?.count ?? 0;
+    const avg = count > 0 ? Number((stats!.totalRating / count).toFixed(1)) : 5.0;
+    return {
+      service: s,
+      reviewCount: count,
+      averageRating: avg,
+    };
+  });
+
+  withStats.sort((a, b) => {
+    if (b.reviewCount !== a.reviewCount) {
+      return b.reviewCount - a.reviewCount;
+    }
+    if (b.averageRating !== a.averageRating) {
+      return b.averageRating - a.averageRating;
+    }
+    if (b.service.isFeatured !== a.service.isFeatured) {
+      return b.service.isFeatured ? 1 : -1;
+    }
+    return a.service.sortOrder - b.service.sortOrder;
+  });
+
+  return withStats.slice(0, limit);
 }
 
 export async function createPublicServiceReview(input: {

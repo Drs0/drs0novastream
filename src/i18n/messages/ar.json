@@ -20,7 +20,9 @@
     "headline": "الخدمات الرقمية والألعاب فبلاصة وحدة",
     "description": "قلّب على الخدمة اللي بغيتي، شوف الأثمنة والتفاصيل، وتواصل معانا فالواتساب.",
     "primaryCta": "شوف الخدمات",
-    "secondaryCta": "تواصل معانا"
+    "secondaryCta": "تواصل معانا",
+    "topRatedBadge": "الأعلى تقييماً",
+    "reviewsLabel": "{count} تقييم"
   },
   "home": {
     "categoriesTitle": "أصناف الخدمات",
