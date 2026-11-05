@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { ChevronDown, ChevronUp, MessageSquare, Star, TrendingUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, TrendingUp } from 'lucide-react';
 import type { ServiceWithReviewStats } from '@/types/catalog';
 import type { Locale } from '@/types/database';
 import { formatMadPrice, localizeOfferImagePath } from '@/lib/formatters';
@@ -14,64 +14,131 @@ interface HeroVerticalCarouselProps {
   locale: Locale;
 }
 
-const STEP_DURATION_MS = 3600;
-const CARD_HEIGHT_DESKTOP = 100; // px (card + gap)
+const STEP_DURATION_MS = 3800;
+const CARD_HEIGHT_DESKTOP = 100; // px (card 90px + gap 10px)
 
 export function HeroVerticalCarousel({ items, locale }: HeroVerticalCarouselProps) {
   const t = useTranslations('hero');
   const catT = useTranslations('catalog');
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // Ensure we have at least 6 items for a seamless 3-card viewport infinite loop
+  const baseItems = useMemo(() => {
+    if (!items || items.length === 0) return [];
+    if (items.length >= 6) return items;
+    const factor = Math.ceil(6 / items.length);
+    const expanded: ServiceWithReviewStats[] = [];
+    for (let i = 0; i < factor; i++) {
+      expanded.push(...items);
+    }
+    return expanded;
+  }, [items]);
+
+  const count = baseItems.length;
+  // Triple the items for clone buffers before and after
+  const loopItems = useMemo(() => {
+    if (count === 0) return [];
+    return [...baseItems, ...baseItems, ...baseItems];
+  }, [baseItems, count]);
+
+  // Start in the middle clone set (index = count)
+  const [currentIndex, setCurrentIndex] = useState(() => count);
   const [isPaused, setIsPaused] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(true);
   const [withTransition, setWithTransition] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // If no items, return null safely
-  if (!items || items.length === 0) {
-    return null;
-  }
+  // Monitor page visibility to prevent runaway timer ticks when browser tab is inactive
+  useEffect(() => {
+    function handleVisibilityChange() {
+      setIsPageVisible(document.visibilityState === 'visible');
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
-  // Triple items for infinite looping
-  const count = items.length;
-  const loopItems = [...items, ...items, ...items];
+  const resetToSafeBounds = useCallback(() => {
+    if (count === 0) return;
+    if (currentIndex >= count * 2) {
+      setWithTransition(false);
+      setCurrentIndex((prev) => (prev >= count * 2 ? prev - count : prev));
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setWithTransition(true);
+        });
+      });
+    } else if (currentIndex < count) {
+      setWithTransition(false);
+      setCurrentIndex((prev) => (prev < count ? prev + count : prev));
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setWithTransition(true);
+        });
+      });
+    }
+  }, [count, currentIndex]);
+
+  // Fallback timer ensuring boundary resets happen even if onTransitionEnd is suppressed by the browser
+  useEffect(() => {
+    if (currentIndex >= count * 2 || currentIndex < count) {
+      const timeout = setTimeout(() => {
+        resetToSafeBounds();
+      }, 520);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, count, resetToSafeBounds]);
+
+  const handleNext = useCallback(() => {
+    if (count <= 1) return;
+    setWithTransition(true);
+    setCurrentIndex((prev) => {
+      // Normalize to middle range before advancing
+      const safePrev = count + (((prev - count) % count) + count) % count;
+      return safePrev + 1;
+    });
+  }, [count]);
+
+  const handlePrev = useCallback(() => {
+    if (count <= 1) return;
+    setWithTransition(true);
+    setCurrentIndex((prev) => {
+      // Normalize to middle range before going backward
+      const safePrev = count + (((prev - count) % count) + count) % count;
+      return safePrev - 1;
+    });
+  }, [count]);
 
   // Auto-advance vertically every STEP_DURATION_MS
   useEffect(() => {
-    if (isPaused || count <= 1) return;
+    if (isPaused || !isPageVisible || count <= 1) return;
 
     timerRef.current = setInterval(() => {
-      setCurrentIndex((prev) => prev + 1);
-      setWithTransition(true);
+      handleNext();
     }, STEP_DURATION_MS);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, count]);
+  }, [isPaused, isPageVisible, count, handleNext]);
 
   function handleTransitionEnd() {
-    // When reached end of second clone, seamlessly reset to middle clone without transition
-    if (currentIndex >= count * 2) {
-      setWithTransition(false);
-      setCurrentIndex((prev) => prev - count);
-    } else if (currentIndex < count) {
-      // If went backwards past start
-      setWithTransition(false);
-      setCurrentIndex((prev) => prev + count);
-    }
+    resetToSafeBounds();
   }
 
-  function handleNext() {
-    setWithTransition(true);
-    setCurrentIndex((prev) => prev + 1);
+  // If no items, return null safely
+  if (!items || items.length === 0 || count === 0) {
+    return null;
   }
 
-  function handlePrev() {
-    setWithTransition(true);
-    setCurrentIndex((prev) => prev - 1);
-  }
+  // Safety clamp: guarantees cards can NEVER scroll out of view or disappear into an empty container
+  const maxSafeIndex = Math.max(0, loopItems.length - 3);
+  const safeIndex = Math.max(0, Math.min(currentIndex, maxSafeIndex));
 
-  const activeOriginalIndex = ((currentIndex % count) + count) % count;
+  // The center spotlight card is safeIndex + 1
+  const spotlightIndex = safeIndex + 1;
+  const activeOriginalIndex =
+    (((spotlightIndex % items.length) + items.length) % items.length);
 
   return (
     <div
@@ -115,7 +182,7 @@ export function HeroVerticalCarousel({ items, locale }: HeroVerticalCarouselProp
           className={styles.track}
           onTransitionEnd={handleTransitionEnd}
           style={{
-            transform: `translateY(-${currentIndex * CARD_HEIGHT_DESKTOP}px)`,
+            transform: `translateY(-${safeIndex * CARD_HEIGHT_DESKTOP}px)`,
             transition: withTransition
               ? 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
               : 'none',
@@ -123,7 +190,7 @@ export function HeroVerticalCarousel({ items, locale }: HeroVerticalCarouselProp
         >
           {loopItems.map((item, idx) => {
             const { service, reviewCount, averageRating } = item;
-            const isSpotlight = idx === currentIndex + 1; // Center card in 3-card window
+            const isSpotlight = idx === spotlightIndex;
             const imgSrc =
               localizeOfferImagePath(service.coverImagePath, locale) ||
               '/images/services/ps-plus-cover.svg';

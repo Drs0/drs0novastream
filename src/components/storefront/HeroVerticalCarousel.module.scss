@@ -75,7 +75,7 @@
 
 .viewport {
   position: relative;
-  height: 300px; // Displays exactly 3 cards (each 100px with gap)
+  height: 290px; // Displays exactly 3 cards (90px card + 10px gap)
   overflow: hidden;
   border-radius: $radius-md;
 }
@@ -103,12 +103,13 @@
 .track {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 10px;
   will-change: transform;
 }
 
 .card {
   height: 90px;
+  flex-shrink: 0;
   padding: 0.65rem 0.8rem;
   border-radius: $radius-md;
   background: rgba(17, 27, 51, 0.7);
